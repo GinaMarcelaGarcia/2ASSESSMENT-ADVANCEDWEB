@@ -57,6 +57,7 @@
 
         </div>
     </main>
+    <script src="assets/js/password-toggle.js"></script>
     <script src="assets/js/register.js"></script>
 </body>
 </html>

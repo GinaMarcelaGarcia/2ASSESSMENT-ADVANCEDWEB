@@ -11,7 +11,6 @@
     <link href="assets/css/auth.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-
     <main class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="card shadow" style="width: 100%; max-width: 400px;">
 
@@ -58,6 +57,7 @@
 
         </div>
     </main>
-
+    <script src="assets/js/password-toggle.js"></script>
+    <script src="assets/js/login.js"></script>
 </body>
 </html>
