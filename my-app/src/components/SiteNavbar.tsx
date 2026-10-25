@@ -21,6 +21,15 @@ function SiteNavbar() {
 
   const location = useLocation(); // current page, changes on every navigation
   const navigate = useNavigate(); // lets us change page from code
+  
+  // Hamburger menu (small screens): open or closed.
+  // It closes by itself when the page changes.
+  const [expanded, setExpanded] = useState(false);
+  const [menuPage, setMenuPage] = useState(location.pathname);
+  if (menuPage !== location.pathname) {
+    setMenuPage(location.pathname);
+    setExpanded(false);
+  }
 
   // Load the genres once, when the navbar first appears.
   // If it fails, the menu is just empty: the rest of the site still works.
@@ -49,7 +58,7 @@ function SiteNavbar() {
   }
 
   return (
-    <Navbar expand="lg" className="tb-navbar" data-bs-theme="dark" collapseOnSelect>
+    <Navbar expand="lg" className="tb-navbar" data-bs-theme="dark" expanded={expanded} onToggle={setExpanded}>
       <Container>
         <Navbar.Brand as={Link} to="/">TrackBack</Navbar.Brand>
 
