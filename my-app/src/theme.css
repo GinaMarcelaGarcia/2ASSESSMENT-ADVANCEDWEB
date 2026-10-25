@@ -1,0 +1,49 @@
+/* theme.css
+   TrackBack colours from the Figma, used by every component.
+   Change a colour here and the whole site follows. */
+
+:root {
+  --tb-primary: #C1330F;       /* red from the Figma (navbar, buttons) */
+  --tb-primary-dark: #9A280B;  /* hover */
+  --tb-footer-bg: #1E1E1E;
+}
+
+/* Navbar */
+.tb-navbar {
+  background-color: var(--tb-primary);
+}
+
+.tb-navbar .navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Underline on the page the user is on (NavLink adds the "active" class) */
+.tb-navbar .nav-link.active {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.tb-btn-light {
+  color: var(--tb-primary);
+  font-weight: 600;
+}
+
+.tb-btn-light:hover {
+  color: var(--tb-primary-dark);
+}
+
+/* Footer */
+.tb-footer {
+  background-color: var(--tb-footer-bg);
+  color: #CCCCCC;
+}
+
+.tb-footer a {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.tb-footer a:hover {
+  text-decoration: underline;
+}
