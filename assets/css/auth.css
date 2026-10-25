@@ -1,5 +1,0 @@
-/* hide eye icon in Edge browser */
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-    display: none;
-}
