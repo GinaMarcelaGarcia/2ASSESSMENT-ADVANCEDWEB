@@ -214,3 +214,13 @@ INSERT INTO albums (id, title, artist_id, genre_id, release_date, writers, label
          'Soft R&B with acoustic guitar and layered vocals about growing up and letting go.', 'rosewater.jpg'),
     (30, 'Slow Bloom',            15, 7, '2021-08-20', 'Emily Carson, Noel Hart',        'Golden Hour Music',
          'Her second album adds strings and slow grooves. A patient, warm record.', 'slow-bloom.jpg');
+
+-- ---------------------------------------------------------------------
+-- Test user: lets us test login before register is ready
+--   email:    test@trackback.com
+--   password: Test1234
+-- The password is saved as a hash made with PHP password_hash(),
+-- so login.php checks it with password_verify() like any other user.
+-- ---------------------------------------------------------------------
+INSERT INTO users (id, username, email, password_hash) VALUES
+    (1, 'testuser', 'test@trackback.com', '$2y$10$lUxQPKFlP7OGkrhMJjVawuxD4XrCbl5xIubKI/CVlxtP.W7wD.SVC');
