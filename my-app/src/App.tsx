@@ -5,6 +5,7 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import SiteNavbar from './components/SiteNavbar';
 import SiteFooter from './components/SiteFooter';
+import Login from './pages/Login';
 import Register from './pages/Register';
 
 // Layout: navbar on top, page in the middle, footer at the bottom.
@@ -48,7 +49,7 @@ function App() {
           {/* Login and Register open as a modal */}
           {isModal && (
             <Routes>
-              <Route path="/login" element={<h1>Sign In</h1>} />                          {/* Emily */}
+              <Route path="/login" element={<Login onClose={closeModal} />} /> {/* Emily */}
               <Route path="/register" element={<Register onClose={closeModal} />} />  {/* Emily */}
             </Routes>
           )}
