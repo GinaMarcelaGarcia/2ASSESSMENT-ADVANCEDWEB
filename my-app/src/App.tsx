@@ -1,34 +1,32 @@
-import './App.css'
+import './App.css';
+import './theme.css';
+import { Routes, Route } from 'react-router';
 import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import SiteNavbar from './components/SiteNavbar';
+import SiteFooter from './components/SiteFooter';
 
+// Layout: navbar on top, page in the middle, footer at the bottom.
+// The <Route> lines are placeholders: each person swaps theirs for the real page component.
 function App() {
-  return ( 
-    <>
-    <Navbar expand="lg" className="bg-body-tertiary" data-bs-theme="dark">
-      <Container>
-    <Navbar.Brand>Sample Website</Navbar.Brand>
-    <Navbar.Toggle aria-controls="main-nav" />
-    <Navbar.Collapse id="main-nav">
-    </Navbar.Collapse>
-    </Container>
-    <nav>
-      <Nav.Link href="/"> Home </Nav.Link>
-      <Nav.Link href="/Album"> Album Detail </Nav.Link>
-    </nav>
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      <SiteNavbar />
 
-    </Navbar>
-    <Container> 
-      <h1> 
-        Hello world
-      </h1>
+      <main className="flex-grow-1">
+        <Container className="py-4">
+          <Routes>
+            <Route path="/" element={<h1>Home</h1>} />                     {/* Gina */}
+            <Route path="/album/:id" element={<h1>Album Detail</h1>} />    {/* Gina */}
+            <Route path="/login" element={<h1>Sign In</h1>} />             {/* Emily */}
+            <Route path="/register" element={<h1>Create Account</h1>} />  {/* Emily */}
+            <Route path="*" element={<h1>Page not found</h1>} />
+          </Routes>
+        </Container>
+      </main>
 
-
-    </Container>
-    </>
-  )
+      <SiteFooter />
+    </div>
+  );
 }
 
-export default App
+export default App;

@@ -37,3 +37,15 @@ session_set_cookie_params([
     'samesite' => 'Lax',
 ]);
 session_start();
+
+// Reads the JSON that React sends in a POST (fetch with JSON.stringify).
+// PHP does not put JSON into $_POST, so we read the raw body and decode it.
+// Usage: $body = getJsonBody(); $email = trim($body['email'] ?? '');
+function getJsonBody()
+{
+    $raw = file_get_contents('php://input');
+    $data = json_decode($raw, true);
+
+    // Empty body or broken JSON: return an empty array, the endpoint validates the fields
+    return is_array($data) ? $data : [];
+}
