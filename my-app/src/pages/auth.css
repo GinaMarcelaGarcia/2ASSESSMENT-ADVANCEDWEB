@@ -1,0 +1,19 @@
+/* Bootstrap icon (eye) */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+/* Hides the default reveal/clear buttons for password fields in Edge */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* length and width of the Login / Register modal */
+.auth-modal {
+    --bs-modal-width: 400px;
+}
+
+/* Red bar at the top of the modal */
+.auth-modal .modal-header {
+    background-color: var(--tb-primary);
+    color: #fff;
+}
