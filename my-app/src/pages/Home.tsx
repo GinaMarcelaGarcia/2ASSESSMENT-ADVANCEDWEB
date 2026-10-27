@@ -1,4 +1,4 @@
-import './Home.css';
+import './HomeTrack.css';
 
 function Home() {
   return (
