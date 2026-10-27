@@ -56,3 +56,56 @@
     padding: 24px;
   }
 }
+
+
+
+/* Filter Albums Section */
+.filter-albums {
+  padding: 35px 20px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.filter-albums h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #222;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.filter-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: nowrap;
+}
+
+.filter-options label {
+  display: block;
+  font-size: 0;
+}
+
+.filter-options select {
+  width: 180px;
+  padding: 12px 15px;
+  border: 2px solid #E9A63E;
+  border-radius: 8px;
+  background-color: white;
+  color: #222;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
