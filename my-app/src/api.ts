@@ -6,6 +6,9 @@
 // Folder name inside htdocs (Windows: C:\xampp\htdocs, Mac: /Applications/XAMPP/htdocs)
 export const API_URL = 'http://localhost/2ASSESSMENT-ADVANCEDWEB/api';
 
+// Folder with the album cover images (cover_image from albums.php is only the file name)
+export const IMAGES_URL = 'http://localhost/2ASSESSMENT-ADVANCEDWEB/assets/images/albums';
+
 // Same shape that sendJson() and sendError() return in PHP
 type ApiResponse<T> =
   | { success: true; data: T }
