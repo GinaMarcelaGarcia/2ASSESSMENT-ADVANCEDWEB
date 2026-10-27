@@ -39,12 +39,14 @@ function App() {
       <SiteNavbar />
 
       <main className="flex-grow-1">
+        {/* Full width, no padding: each page wraps its own content in <Container className="py-4">.
+    Only full width parts (e.g. Home banner) stay outside a Container. */}
         <Container fluid className="p-0">
           {/* While a modal is open, keep showing the page behind it */}
           <Routes location={isModal ? backgroundPage : location}>
             <Route path="/" element={<Home />} />                     {/* Gina */}
             <Route path="/album/:id" element={<h1>Album Detail</h1>} />    {/* Gina */}
-            <Route path="*" element={<h1>Page not found</h1>} />
+            <Route path="*" element={<Container className="py-4"><h1>Page not found</h1></Container>} />
           </Routes>
 
           {/* Login and Register open as a modal */}
