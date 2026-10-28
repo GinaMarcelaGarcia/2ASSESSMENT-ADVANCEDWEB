@@ -215,7 +215,7 @@
 
 .gallery-card h3 {
   position: absolute;
-  bottom: 35px;
+  bottom: 15px;
   right: 0;
   width: 80%;
   box-sizing: border-box;
@@ -241,6 +241,17 @@
 .gallery-card span {
   font-size: 14px;
   color: #777;
+}
+
+.gallery-cover {
+  position: relative; /* h3 is positioned from the image, not the whole card */
+  margin-bottom: 8px;
+}
+
+.gallery-rating {
+  font-size: 14px;
+  font-weight: bold;
+  color: #E9A63E; /* amber from Figma, same as stars */
 }
 
 @media (max-width: 768px) {

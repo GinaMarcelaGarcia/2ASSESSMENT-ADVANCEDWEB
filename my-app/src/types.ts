@@ -9,3 +9,8 @@ export type Album = {
   avg_rating: number | null;
   review_count: number;
 };
+
+export type Genre = {
+  id: number;
+  name: string;
+};

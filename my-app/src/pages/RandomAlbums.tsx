@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Album } from "../types";
 import "./RandomAlbums.css";
+import { IMAGES_URL } from "../api";
 
 function RandomAlbums({ albums }: { albums: Album[] }) {
   const [startIndex, setStartIndex] = useState(0);
@@ -49,7 +50,7 @@ function RandomAlbums({ albums }: { albums: Album[] }) {
             {visibleAlbums.map((album) => (
               <div className="album-card" key={album.id}>
                 <img
-                  src={`/assets/${album.cover_image}`}
+                  src={`${IMAGES_URL}/${album.cover_image}`}
                   alt={album.title}
                 />
                 <h3>{album.title}</h3>
