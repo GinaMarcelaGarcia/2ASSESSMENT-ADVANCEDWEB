@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import "./HomeTrack.css";
 import RandomAlbums from "./RandomAlbums";
 import type { Album } from "../types";
-import { apiGet } from "../api";
+import { apiGet, IMAGES_URL } from "../api";
 import { Container } from "react-bootstrap";
 
 function Home() {
@@ -160,7 +160,7 @@ return (
     {galleryAlbums.map((album) => (
       <div className="gallery-card" key={album.id}>
         <img
-          src={`/assets/${album.cover_image}`}
+          src={`${IMAGES_URL}/${album.cover_image}`}
           alt={album.title}
         />
         <h3>{album.title}</h3>
