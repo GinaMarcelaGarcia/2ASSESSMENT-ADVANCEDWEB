@@ -153,7 +153,7 @@ function Home() {
         <div className="rating-options">
           <button type="button" className="rating-option">
             <span className="rating-emoji">🔥</span>
-            <span>Most heard</span>
+            <span>Must Hear</span>
           </button>
 
           <button type="button" className="rating-option">
@@ -168,7 +168,7 @@ function Home() {
         </div>
       </section>
 
-      {/* GALLERY */}
+            {/* GALLERY */}
       <section className="album-gallery">
         {filteredAlbums.length === 0 ? (
           <p className="text-center">No albums found for this filter.</p>
@@ -176,13 +176,21 @@ function Home() {
           <div className="gallery-grid">
             {filteredAlbums.map((album) => (
               <div className="gallery-card" key={album.id}>
-                <img
-                  src={`${IMAGES_URL}/${album.cover_image}`}
-                  alt={album.title}
-                />
-                <h3>{album.title}</h3>
+                {/* Image + title together, so the title sits on the image */}
+                <div className="gallery-cover">
+                  <img
+                    src={`${IMAGES_URL}/${album.cover_image}`}
+                    alt={album.title}
+                  />
+                  <h3>{album.title}</h3>
+                </div>
                 <p>{album.artist}</p>
                 <span>{album.year}</span>
+                <div className="gallery-rating">
+                  {album.avg_rating !== null
+                    ? `★ ${album.avg_rating} (${album.review_count})`
+                    : "No reviews yet"}
+                </div>
               </div>
             ))}
           </div>
