@@ -1,43 +1,11 @@
 
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
+import type { Album } from "../types";
 import "./RandomAlbums.css";
 
-type Album = {
-  id: number;
-  title: string;
-  artist: string;
-  genre: string;
-  year: number;
-  cover_image: string;
-  avg_rating: number | null;
-  review_count: number;
-};
-
-function RandomAlbums() {
-  const [albums, setAlbums] = useState<Album[]>([]);
+function RandomAlbums({ albums }: { albums: Album[] }) {
   const [startIndex, setStartIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetch("/api/albums.php")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Could not load albums.");
-        }
-        return response.json();
-      })
-      .then((result) => {
-        if (!result.success) {
-          throw new Error(result.error || "Could not load albums.");
-        }
-        setAlbums(result.data);
-      })
-      .catch(() => {
-        setError("Albums could not be loaded. Please try again.");
-      })
-      .finally(() => setLoading(false));
-  }, []);
 
   const nextAlbums = () => {
     if (albums.length > 0) {
@@ -65,14 +33,9 @@ function RandomAlbums() {
         <p>Discover something new and find your next favourite</p>
       </div>
 
-      {loading && <p>Loading albums...</p>}
-      {error && <p>{error}</p>}
-
-      {!loading && !error && albums.length === 0 && (
-        <p>No albums available yet.</p>
-      )}
-
-      {!loading && !error && albums.length > 0 && (
+      {albums.length === 0 ? (
+        <p>No albums found.</p>
+      ) : (
         <div className="albums-carousel">
           <button
             className="album-arrow"

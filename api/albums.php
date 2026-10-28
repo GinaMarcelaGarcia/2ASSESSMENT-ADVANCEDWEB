@@ -87,7 +87,7 @@ if (isset($_GET['genre'])) {
         WHERE a.genre_id = :genre
         GROUP BY a.id
         ORDER BY RAND()
-        LIMIT 8
+        LIMIT 12
     ');
     $stmt->execute(['genre' => $genreId]);
 } else {
@@ -107,7 +107,7 @@ if (isset($_GET['genre'])) {
         LEFT JOIN reviews r ON r.album_id = a.id
         GROUP BY a.id
         ORDER BY RAND()
-        LIMIT 8
+        LIMIT 12
     ');
     $stmt->execute();
 }
@@ -116,5 +116,6 @@ $albums = $stmt->fetchAll();
 
 // A genre with no albums gives an empty list [], not an error
 $albums = array_map('fixRating', $albums);
+
 
 sendJson($albums);
