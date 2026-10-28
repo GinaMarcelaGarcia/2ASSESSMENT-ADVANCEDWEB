@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import "./HomeTrack.css";
 import RandomAlbums from "./RandomAlbums";
 import type { Album } from "../types";
+import { apiGet } from "../api";
 
 function Home() {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -12,24 +13,11 @@ function Home() {
   const [year, setYear] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("/api/albums.php")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Could not load albums");
-        }
-        return response.json();
-      })
-      .then((result) => {
-        if (!result.success) {
-          throw new Error("Could not load albums");
-        }
-        console.log("Albums received:", result.data.length);
-        setAlbums(result.data);
-      })
-      .catch(() => {
-        setError("Albums could not be loaded.");
-      });
+    useEffect(() => {
+    // apiGet already checks success and throws an Error with the PHP message
+    apiGet<Album[]>("albums.php")
+      .then((data) => setAlbums(data))
+      .catch((err: Error) => setError(err.message));
   }, []);
 
   const genres = [...new Set(albums.map((album) => album.genre))].sort();
