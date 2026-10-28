@@ -5,6 +5,7 @@ import "./HomeTrack.css";
 import RandomAlbums from "./RandomAlbums";
 import type { Album } from "../types";
 import { apiGet } from "../api";
+import { Container } from "react-bootstrap";
 
 function Home() {
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -61,7 +62,13 @@ return (
         </div>
       </section>
 
-      {error ? <p>{error}</p> : <RandomAlbums albums={albums} />}
+            {error ? (
+        <Container className="py-4">
+          <p className="text-danger">{error}</p>
+        </Container>
+      ) : (
+        <RandomAlbums albums={albums} />
+      )}
 
       <section className="filter-albums">
         <h2 className="filter-title">

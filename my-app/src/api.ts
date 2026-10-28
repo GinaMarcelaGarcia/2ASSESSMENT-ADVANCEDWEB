@@ -14,9 +14,19 @@ type ApiResponse<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
+  // fetch() itself throws when the server is off (Apache down, no internet).
+// We swap the browser message "Failed to fetch" for a clear one.
+async function send(url: string, options: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, options);
+  } catch {
+    throw new Error('Could not reach the server.');
+  }
+}
+
 // GET request. Example: const genres = await apiGet<Genre[]>('genres.php');
 export async function apiGet<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_URL}/${path}`, {
+  const response = await send(`${API_URL}/${path}`, {
     credentials: 'include', // send the session cookie to PHP
   });
   return readAnswer<T>(response);
@@ -24,7 +34,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 
 // POST request with a JSON body. Example: await apiPost('login.php', { email, password });
 export async function apiPost<T>(path: string, body: object = {}): Promise<T> {
-  const response = await fetch(`${API_URL}/${path}`, {
+  const response = await send(`${API_URL}/${path}`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
