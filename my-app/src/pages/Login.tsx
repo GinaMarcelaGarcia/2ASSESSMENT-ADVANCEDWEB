@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import Modal from 'react-bootstrap/Modal';
 import PasswordInput from '../components/PasswordInput';
+import { apiPost } from '../api';
 import './auth.css';
 
 type LoginErrors = {
@@ -10,13 +11,15 @@ type LoginErrors = {
 };
 
 type LoginProps = {
-    onClose: () => void; // app tells the App what to do when the modal is closed
+    onClose: () => void; // tells the App what to do when the modal is closed
 };
 
 function Login({ onClose }: LoginProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState<LoginErrors>({});
+    const [serverError, setServerError] = useState(''); // message that comes from the PHP API
+    const [loading, setLoading] = useState(false);       // true while waiting for the PHP answer
 
     function validate(): LoginErrors {
         const newErrors: LoginErrors = {};
@@ -32,15 +35,26 @@ function Login({ onClose }: LoginProps) {
         return newErrors;
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault(); // does not reload the page
+        setServerError('');
 
         const newErrors = validate();
         setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) {
+            return; // the form has errors, don't call the PHP API
+        }
 
-        if (Object.keys(newErrors).length === 0) {
-            // next step: send the data to the PHP API
-            console.log('Form is valid:', { email });
+        setLoading(true);
+        try {
+            // send e-mail and password to api/login.php
+            await apiPost('login.php', { email: email.trim(), password });
+            onClose(); // login is correct: close the modal, the navbar shows the user by itself
+        } catch (error) {
+            // e.g. "Incorrect e-mail or password." or "Could not reach the server."
+            setServerError(error instanceof Error ? error.message : 'Something went wrong.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -52,6 +66,12 @@ function Login({ onClose }: LoginProps) {
 
             <Modal.Body className="p-4">
                 <h1 className="h4 text-center fw-bold mb-4">Sign In</h1>
+
+                {serverError && (
+                    <div className="alert alert-danger py-2 small text-center" role="alert">
+                        {serverError}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit} noValidate>
                     <div className="mb-3">
@@ -81,8 +101,8 @@ function Login({ onClose }: LoginProps) {
                     </div>
 
                     <div className="text-center">
-                        <button type="submit" className="btn text-white rounded-pill px-5" style={{ backgroundColor: 'var(--tb-primary)' }}>
-                            Sign In
+                        <button type="submit" className="btn text-white rounded-pill px-5" style={{ backgroundColor: 'var(--tb-primary)' }} disabled={loading}>
+                            {loading ? 'Signing in...' : 'Sign In'}
                         </button>
                     </div>
                 </form>
