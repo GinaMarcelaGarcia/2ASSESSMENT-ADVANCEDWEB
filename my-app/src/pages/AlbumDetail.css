@@ -1,0 +1,59 @@
+.album-detail-page {
+  width: 100%;
+}
+
+.album-banner {
+  width: 100%;
+  min-height: 380px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+}
+
+.album-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(12px);
+  transform: scale(1.05);
+}
+
+.album-banner-overlay {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: center;
+  gap: 35px;
+  padding: 45px 8%;
+  background: rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+.album-banner-cover {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.album-banner-info {
+  color: white;
+}
+
+.album-banner-info h1 {
+  font-size: 42px;
+  margin: 0 0 12px;
+}
+
+.album-banner-info h2 {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0;
+}

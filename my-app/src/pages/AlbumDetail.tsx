@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { apiGet } from "../api";
+import { apiGet, IMAGES_URL } from "../api";
+import "./AlbumDetail.css";
 
 type AlbumDetailsData = {
   id: number;
@@ -16,6 +17,7 @@ type AlbumDetailsData = {
   cover_image: string;
   avg_rating: number | null;
   review_count: number;
+  year: number;
 };
 
 function AlbumDetail() {
@@ -35,13 +37,24 @@ function AlbumDetail() {
   if (error) return <p>{error}</p>;
   if (!album) return <p>Loading album...</p>;
 
-  return (
-    <div>
-      <h1>{album.title}</h1>
-      <h2>{album.artist}</h2>
-      <p>{album.description}</p>
-    </div>
-  );
+ return (
+  <div className="album-detail-page">
+    <section
+      className="album-banner"
+      style={{
+        backgroundImage: `url("${IMAGES_URL}/${album.cover_image}")`,
+      }}
+    >
+      <div className="album-banner-overlay">
+        <img
+          className="album-banner-cover"
+          src={`${IMAGES_URL}/${album.cover_image}`}
+          alt={`${album.title} album cover`}
+        />
+      </div>
+    </section>
+  </div>
+);
 }
 
 export default AlbumDetail;

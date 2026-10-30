@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { useSearchParams } from "react-router";
+import { useSearchParams, useNavigate } from "react-router";
 import "./HomeTrack.css";
 import RandomAlbums from "./RandomAlbums";
 import { apiGet, IMAGES_URL } from "../api";
 import type { Album, Genre } from "../types";
 
 function Home() {
+  const navigate = useNavigate();
   // Carousel: random albums, always without filter (discovery)
   const [exploreAlbums, setExploreAlbums] = useState<Album[]>([]);
   // Gallery: albums of the chosen genre (or random if no genre)
@@ -175,7 +176,12 @@ function Home() {
         ) : (
           <div className="gallery-grid">
             {filteredAlbums.map((album) => (
-              <div className="gallery-card" key={album.id}>
+              <div
+                 className="gallery-card"
+                  key={album.id}
+                   onClick={() => navigate(`/album/${album.id}`)}
+                   style={{ cursor: "pointer" }}
+                    >
                 {/* Image + title together, so the title sits on the image */}
                 <div className="gallery-cover">
                   <img

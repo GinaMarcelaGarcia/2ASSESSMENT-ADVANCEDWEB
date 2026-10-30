@@ -1,11 +1,13 @@
 
 
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import type { Album } from "../types";
 import "./RandomAlbums.css";
 import { IMAGES_URL } from "../api";
 
 function RandomAlbums({ albums }: { albums: Album[] }) {
+  const navigate = useNavigate();
   const [startIndex, setStartIndex] = useState(0);
 
   const nextAlbums = () => {
@@ -48,7 +50,12 @@ function RandomAlbums({ albums }: { albums: Album[] }) {
 
           <div className="albums-grid">
             {visibleAlbums.map((album) => (
-              <div className="album-card" key={album.id}>
+              <div
+               className="album-card"
+               key={album.id}
+               onClick={() => navigate(`/album/${album.id}`)}
+                style={{ cursor: "pointer" }}
+          >
                 <img
                   src={`${IMAGES_URL}/${album.cover_image}`}
                   alt={album.title}
