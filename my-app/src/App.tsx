@@ -8,6 +8,7 @@ import SiteFooter from './components/SiteFooter';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
+import AlbumDetail from './pages/AlbumDetail';
 
 // Layout: navbar on top, page in the middle, footer at the bottom.
 // The <Route> lines are placeholders: each person swaps theirs for the real page component.
@@ -45,7 +46,7 @@ function App() {
           {/* While a modal is open, keep showing the page behind it */}
           <Routes location={isModal ? backgroundPage : location}>
             <Route path="/" element={<Home />} />                     {/* Gina */}
-            <Route path="/album/:id" element={<h1>Album Detail</h1>} />    {/* Gina */}
+           <Route path="/album/:id" element={<AlbumDetail />} />    {/* Gina */}
             <Route path="*" element={<Container className="py-4"><h1>Page not found</h1></Container>} />
           </Routes>
 

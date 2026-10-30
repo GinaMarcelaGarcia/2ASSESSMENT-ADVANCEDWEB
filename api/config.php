@@ -19,7 +19,18 @@ set_exception_handler(function ($e) {
 
 // 2. CORS: React runs on port 5173 and PHP on port 80.
 // The browser blocks calls between different ports unless PHP allows it here.
-header('Access-Control-Allow-Origin: http://localhost:5173');
+$allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174'
+];
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Vary: Origin');
+}
+
 header('Access-Control-Allow-Credentials: true'); // lets the session cookie travel with fetch
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
