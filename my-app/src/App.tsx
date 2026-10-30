@@ -1,6 +1,6 @@
 import './App.css';
 import './theme.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import SiteNavbar from './components/SiteNavbar';
@@ -29,6 +29,12 @@ function App() {
   if (!isModal && backgroundPage !== currentPage) {
     setBackgroundPage(currentPage);
   }
+
+  // When the page behind changes (e.g. Home -> Album), start at the top.
+  // Opening or closing a modal does not change it, so the page stays where it was.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [backgroundPage]);
 
   // Closing the modal goes back to the page behind it
   function closeModal() {

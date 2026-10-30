@@ -71,7 +71,7 @@ function Register({ onClose }: RegisterProps) {
     }
 
     return (
-                <Modal show onHide={onClose} centered dialogClassName="auth-modal">
+                <Modal show onHide={onClose} centered dialogClassName="auth-modal" restoreFocus={false}>
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title as="span" className="fs-6 fw-bold">TrackBack</Modal.Title>
                 </Modal.Header>
