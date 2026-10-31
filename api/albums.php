@@ -61,61 +61,104 @@ if (isset($_GET['id'])) {
     sendJson(fixRating($album));
 }
 
+
 // ---------------------------------------------------------------------
-// List of albums: no id in the URL
+// Popular albums: ?popular=1&page=1 or ?popular=1&page=2
+// ---------------------------------------------------------------------
+if (isset($_GET['popular'])) {
+
+    $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1, 'max_range' => 2]
+    ]);
+
+    if ($page === false) {
+        sendError('Invalid page number.', 400);
+    }
+
+    $offset = ($page - 1) * 9;
+
+    $stmt = $pdo->prepare('
+        SELECT a.id, a.title,
+               ar.name AS artist,
+               g.name AS genre,
+               YEAR(a.release_date) AS year,
+               a.cover_image,
+               ROUND(AVG(r.rating), 1) AS avg_rating,
+               COUNT(r.id) AS review_count
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        JOIN genres g ON g.id = a.genre_id
+        LEFT JOIN reviews r ON r.album_id = a.id
+        GROUP BY a.id
+        ORDER BY a.id ASC
+        LIMIT 9 OFFSET :offset
+    ');
+
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $albums = $stmt->fetchAll();
+    $albums = array_map('fixRating', $albums);
+
+    sendJson($albums);
+}
+
+// ---------------------------------------------------------------------
+// List of albums: genre filter or Home page
 // ---------------------------------------------------------------------
 if (isset($_GET['genre'])) {
-    // Same check as the id: only a whole number of 1 or more
-    $genreId = filter_var($_GET['genre'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+    $genreId = filter_var($_GET['genre'], FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 1]
+    ]);
+
     if ($genreId === false) {
         sendError('Invalid genre id.', 400);
     }
 
-    // Random albums from one genre
     $stmt = $pdo->prepare('
         SELECT a.id, a.title,
                ar.name AS artist,
-               g.name  AS genre,
+               g.name AS genre,
                YEAR(a.release_date) AS year,
                a.cover_image,
                ROUND(AVG(r.rating), 1) AS avg_rating,
-               COUNT(r.id)             AS review_count
+               COUNT(r.id) AS review_count
         FROM albums a
-        JOIN artists ar     ON ar.id = a.artist_id
-        JOIN genres g       ON g.id = a.genre_id
+        JOIN artists ar ON ar.id = a.artist_id
+        JOIN genres g ON g.id = a.genre_id
         LEFT JOIN reviews r ON r.album_id = a.id
         WHERE a.genre_id = :genre
         GROUP BY a.id
         ORDER BY RAND()
         LIMIT 12
     ');
+
     $stmt->execute(['genre' => $genreId]);
+
 } else {
-    // Random albums from any genre (Home page).
-    // No user input here, but we keep prepare() so both branches look the same.
+
     $stmt = $pdo->prepare('
         SELECT a.id, a.title,
                ar.name AS artist,
-               g.name  AS genre,
+               g.name AS genre,
                YEAR(a.release_date) AS year,
                a.cover_image,
                ROUND(AVG(r.rating), 1) AS avg_rating,
-               COUNT(r.id)             AS review_count
+               COUNT(r.id) AS review_count
         FROM albums a
-        JOIN artists ar     ON ar.id = a.artist_id
-        JOIN genres g       ON g.id = a.genre_id
+        JOIN artists ar ON ar.id = a.artist_id
+        JOIN genres g ON g.id = a.genre_id
         LEFT JOIN reviews r ON r.album_id = a.id
         GROUP BY a.id
         ORDER BY RAND()
         LIMIT 12
     ');
+
     $stmt->execute();
 }
 
 $albums = $stmt->fetchAll();
-
-// A genre with no albums gives an empty list [], not an error
 $albums = array_map('fixRating', $albums);
-
 
 sendJson($albums);

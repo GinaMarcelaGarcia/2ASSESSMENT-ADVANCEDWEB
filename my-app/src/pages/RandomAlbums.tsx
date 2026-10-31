@@ -6,7 +6,13 @@ import type { Album } from "../types";
 import "./RandomAlbums.css";
 import { IMAGES_URL } from "../api";
 
-function RandomAlbums({ albums }: { albums: Album[] }) {
+function RandomAlbums({
+  albums,
+  title = "Explore Albums",
+}: {
+  albums: Album[];
+  title?: string;
+}) {
   const navigate = useNavigate();
   const [startIndex, setStartIndex] = useState(0);
 
@@ -32,7 +38,7 @@ function RandomAlbums({ albums }: { albums: Album[] }) {
   return (
     <section className="random-albums">
       <div className="albums-heading">
-        <h2>Explore Albums</h2>
+        <h2>{title}</h2>
         <p>Discover something new and find your next favourite</p>
       </div>
 
