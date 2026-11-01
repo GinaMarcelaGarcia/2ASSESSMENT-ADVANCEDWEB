@@ -17,6 +17,8 @@ function Home() {
   const [year, setYear] = useState("");
   const [error, setError] = useState("");
 
+  const [visibleAlbums, setVisibleAlbums] = useState(8);
+
   // The genre lives in the URL (/?genre=3), so the Navbar menu
   // and the dropdown on this page always show the same thing
   const [searchParams, setSearchParams] = useSearchParams();
@@ -64,6 +66,10 @@ function Home() {
       (!year || album.year === Number(year))
     );
   });
+  const displayedAlbums = filteredAlbums.slice(0, visibleAlbums);
+  console.log("Total albums:", albums.length);
+console.log("Filtered albums:", filteredAlbums.length);
+console.log("Visible albums:", visibleAlbums);
 
   return (
     <>
@@ -175,7 +181,7 @@ function Home() {
           <p className="text-center">No albums found for this filter.</p>
         ) : (
           <div className="gallery-grid">
-            {filteredAlbums.map((album) => (
+            {displayedAlbums.map((album) => (
               <div
                  className="gallery-card"
                   key={album.id}
@@ -202,9 +208,15 @@ function Home() {
           </div>
         )}
 
-        <button className="load-more-button" type="button">
-          Load More
-        </button>
+       {visibleAlbums < filteredAlbums.length && (
+  <button
+    className="load-more-button"
+    type="button"
+    onClick={() => setVisibleAlbums((prev) => prev + 8)}
+  >
+    Load More
+  </button>
+)}
       </section>
     </>
   );

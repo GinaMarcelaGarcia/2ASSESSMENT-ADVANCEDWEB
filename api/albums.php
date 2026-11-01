@@ -131,7 +131,7 @@ if (isset($_GET['genre'])) {
         WHERE a.genre_id = :genre
         GROUP BY a.id
         ORDER BY RAND()
-        LIMIT 12
+        LIMIT 28
     ');
 
     $stmt->execute(['genre' => $genreId]);
@@ -152,7 +152,7 @@ if (isset($_GET['genre'])) {
         LEFT JOIN reviews r ON r.album_id = a.id
         GROUP BY a.id
         ORDER BY RAND()
-        LIMIT 12
+        LIMIT 28
     ');
 
     $stmt->execute();

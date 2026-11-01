@@ -82,7 +82,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 15px;
   flex-wrap: nowrap;
 }
 
@@ -93,7 +93,7 @@
 
 .filter-options select {
   width: 180px;
-  padding: 12px 15px;
+  padding: 12px 10px;
   border: 2px solid #E9A63E;
   border-radius: 8px;
   background-color: white;
@@ -107,7 +107,7 @@
 .filter-title {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap:13px;
 }
 
 
