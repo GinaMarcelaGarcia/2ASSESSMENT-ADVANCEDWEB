@@ -13,9 +13,10 @@ function SiteFooter() {
         <span>&copy; {year} TrackBack. Made by Dragonfruit.</span>
 
         <nav className="d-flex gap-3">
-          <Link to="/">Home</Link>
-          <Link to="/login">Sign In</Link>
-          <Link to="/register">Register</Link>
+          {/* Footer links go back to the top of the page (the modals keep the page behind them) */}
+          <Link to="/" onClick={() => window.scrollTo(0, 0)}>Home</Link>
+          <Link to="/login" onClick={() => window.scrollTo(0, 0)}>Sign In</Link>
+          <Link to="/register" onClick={() => window.scrollTo(0, 0)}>Register</Link>
         </nav>
       </Container>
     </footer>
