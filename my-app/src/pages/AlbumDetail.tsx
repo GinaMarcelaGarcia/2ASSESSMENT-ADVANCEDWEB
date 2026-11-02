@@ -119,6 +119,11 @@ function AlbumDetail() {
 
   if (error) return <p>{error}</p>;
   if (!album) return <p>Loading album...</p>;
+  
+  // Average rating comes from the API (AVG of the reviews table).
+  // null = no reviews yet. Rounded to show whole stars; the exact number shows next to them.
+  const roundedRating =
+    album.avg_rating !== null ? Math.round(album.avg_rating) : 0;
 
   return (
     <div className="album-detail-page">
@@ -161,12 +166,20 @@ function AlbumDetail() {
               alt={`${album.title} album cover`}
             />
 
-            <div className="album-title-rating">
+                        <div className="album-title-rating">
               <h2>{album.title}</h2>
 
-              <div className="album-stars">
-                ★★★★★
-              </div>
+              {album.avg_rating !== null ? (
+                <div className="album-stars">
+                  {"★".repeat(roundedRating)}
+                  {"☆".repeat(5 - roundedRating)}
+                  <span className="album-rating-number">
+                    {album.avg_rating} ({album.review_count})
+                  </span>
+                </div>
+              ) : (
+                <p className="album-no-reviews">No reviews yet</p>
+              )}
             </div>
 
           </div>
