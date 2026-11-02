@@ -89,8 +89,9 @@ if (isset($_GET['popular'])) {
         JOIN artists ar ON ar.id = a.artist_id
         JOIN genres g ON g.id = a.genre_id
         LEFT JOIN reviews r ON r.album_id = a.id
+                           AND r.created_at >= NOW() - INTERVAL 7 DAY
         GROUP BY a.id
-        ORDER BY a.id ASC
+        ORDER BY review_count DESC, avg_rating DESC, a.id ASC
         LIMIT 9 OFFSET :offset
     ');
 
