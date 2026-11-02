@@ -148,6 +148,22 @@
   letter-spacing: 5px;
 }
 
+/* Number next to the stars: "4.2 (3)" */
+.album-rating-number {
+  font-size: 18px;
+  color: #974E25;
+  letter-spacing: 0;   /* .album-stars has letter-spacing 5px, reset it here */
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* Shown when the album has no reviews */
+.album-no-reviews {
+  font-size: 18px;
+  color: #974E25;
+  margin: 0;
+}
+
 .album-information-text {
   margin-top: 40px;
   border-top: 1px solid #E69D3C;
