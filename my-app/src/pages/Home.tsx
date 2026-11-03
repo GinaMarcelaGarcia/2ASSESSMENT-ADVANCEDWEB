@@ -67,9 +67,6 @@ function Home() {
     );
   });
   const displayedAlbums = filteredAlbums.slice(0, visibleAlbums);
-  console.log("Total albums:", albums.length);
-console.log("Filtered albums:", filteredAlbums.length);
-console.log("Visible albums:", visibleAlbums);
 
   return (
     <>
