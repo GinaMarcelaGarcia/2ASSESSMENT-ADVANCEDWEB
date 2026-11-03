@@ -33,7 +33,6 @@ type Review = {
   rating: number;
   comment: string;
   favouriteAlbum: string;
-  leastFavouriteSong: string;
 };
 
 const reviewData: Review[] = [
@@ -45,8 +44,7 @@ const reviewData: Review[] = [
     rating: 5,
     comment:
       "Update (after seeing the opinions of others): Y'all won't be happy with ANYTHING OMG, if any other artist released these four tracks y'all wouldn't shut up about how good they are. 🫩",
-    favouriteAlbum: "Lunar Dust",
-    leastFavouriteSong: "Cleveland!",
+    favouriteAlbum: "Lunar Dust"
   },
   {
     id: 2,
@@ -56,8 +54,7 @@ const reviewData: Review[] = [
     rating: 5,
     comment:
       "Honestly, I didn’t expect to enjoy this album as much as I did. Some of the songs are definitely more playful than what I usually listen to, but I think that’s what makes it fun.",
-    favouriteAlbum: "Velvet Hours",
-    leastFavouriteSong: "After the Rain",
+    favouriteAlbum: "Velvet Hours"
   },
 ];
 
@@ -324,11 +321,6 @@ function AlbumDetail() {
                 <p>
                   <strong>Favourite Album:</strong>{" "}
                   {review.favouriteAlbum}
-                </p>
-
-                <p>
-                  <strong>Least favourite song:</strong>{" "}
-                  {review.leastFavouriteSong}
                 </p>
 
               </div>
