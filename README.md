@@ -1,10 +1,34 @@
 # TrackBack
 
-TrackBack is a music album review website. Visitors can browse albums by genre and see album details. Registered users can sign in to write reviews (reviews come in Assessment 3).
+TrackBack is a music album review website. Visitors can browse albums by genre and see album details without an account. Users can register, sign in and log out. Writing reviews, favourites and the account page come in Assessment 3.
 
 INT1059 Advanced Web, AIT Sydney. Group **Dragonfruit**: Gina, Emily and Vinny.
 
 All albums and artists in the database are made up for this project, and the cover images are original.
+
+---
+
+## Features
+
+Status at the end of Assessment 2 (prototype).
+
+### Done
+
+- **Live dataset:** MySQL database with 30 albums, 15 artists and 8 genres
+- **Home page:** random albums, genre filter (also in the navbar), artist and year filters, Load More
+- **Album detail page:** cover, title, description and metadata (artist, genre, release date, writers, label), average rating or "No reviews yet"
+- **Register, sign in and log out:** modal forms, validation in React and PHP, passwords saved as a hash, session in PHP
+- **Navbar:** shows "Sign In" / "Register", or the username and "Log out" when signed in
+- **Popular this week** (additional feature): albums with the most reviews in the last 7 days come first. Until reviews exist, albums show in default order
+
+### Planned for Assessment 3
+
+- Write, edit and delete reviews (the reviews on the album page are sample data for now)
+- Favourites list
+- My Account page (my reviews, favourites, account settings)
+- Search
+- Highest rated and Browsing by rating (Must Hear / Loved / Okay)
+- Mobile layout fixes on the Home page
 
 ---
 
@@ -18,29 +42,6 @@ All albums and artists in the database are made up for this project, and the cov
 | Local server | XAMPP (Apache + MySQL) |
 
 React runs on `http://localhost:5173` and asks the PHP API for data. The PHP API runs on Apache (`http://localhost`) and talks to the database.
-
----
-
-## Folder structure
-
-```
-2ASSESSMENT-ADVANCEDWEB/
-├── api/                    PHP API (runs on XAMPP)
-│   ├── config.php          shared setup: CORS, session, error handling
-│   ├── db.php              database connection (PDO)
-│   ├── response.php        sendJson() and sendError()
-│   └── *.php               one file per endpoint
-├── assets/images/albums/   album cover images
-├── database/
-│   └── trackback.sql       database schema + sample data
-└── my-app/                 React app (Vite)
-    └── src/
-        ├── api.ts          apiGet() and apiPost(), the only place that calls the API
-        ├── components/     parts used on many pages (navbar, footer, inputs)
-        ├── pages/          one file per page
-        ├── theme.css       site colours
-        └── App.tsx         layout and routes
-```
 
 ---
 
@@ -76,7 +77,9 @@ Open the XAMPP Control Panel (Mac: `manager-osx`) and start **Apache** and **MyS
 2. Click **Import**
 3. Choose `database/trackback.sql` and click **Import**
 
-This creates the `trackback` database with 8 genres, 15 artists and 30 albums. Importing again resets it to the original data.
+This creates the `trackback` database with 8 genres, 15 artists, 30 albums and one test user. Importing again resets it to the original data (users registered on your computer are deleted).
+
+**Test user:** `test@trackback.com` / `Test1234`
 
 The API connects with the XAMPP default user (`root`, no password). If your MySQL has a password, change it in `api/db.php`.
 
@@ -97,47 +100,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. The red navbar should show, and the **Genres** menu should list 8 genres.
-
----
-
-## API
-
-Every answer has the same format:
-
-```json
-{ "success": true,  "data": ... }
-{ "success": false, "error": "Message for the user" }
-```
-
-| Endpoint | Method | What it does | Status |
-|---|---|---|---|
-| `genres.php` | GET | List of all genres | Done |
-| `me.php` | GET | User logged in now, or `null` | Done |
-| `albums.php` | GET | Random albums, optional `?genre=ID` | In progress |
-| `album.php?id=ID` | GET | One album with artist and genre | In progress |
-| `register.php` | POST | Create an account | In progress |
-| `login.php` | POST | Sign in and start the session | In progress |
-| `logout.php` | POST | End the session | In progress |
-
-### Rules for every endpoint
-
-- Start with `require_once __DIR__ . '/config.php';`
-- Answer only with `sendJson()` or `sendError()`, with the right status code
-- Use prepared statements for any value that comes from the user
-- Passwords use `password_hash()` and `password_verify()`
-- Validate in PHP too, even if React already validated
-- Never show raw PHP errors: use `try/catch`
-
----
-
-## How we work with Git
-
-- `HOME` is the main branch and must always work
-- One branch per feature, created from an updated `HOME` (e.g. `feature/auth`)
-- Small commits with a clear message (e.g. `Add login endpoint`)
-- Pull request to merge into `HOME`
-- Pull `HOME` before starting work each day
+Open `http://localhost:5173`. The red navbar should show, and the **Genres** menu should list 8 genres. Sign in with the test user to check the login.
 
 ---
 
@@ -145,8 +108,8 @@ Every answer has the same format:
 
 | Problem | Fix |
 |---|---|
-| `npm` blocked in PowerShell ("running scripts is disabled") | Run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once, or use Command Prompt |
 | `genres.php` shows "Not Found" | The folder is not inside `htdocs` or has a different name |
 | "Could not connect to the database." | MySQL is not running, or the database was not imported |
 | Genres menu is empty | Apache is not running, or the API path is wrong |
 | Album covers do not show | Check that `assets/images/albums/` exists in your copy |
+| Nothing loads and the browser console (F12) shows a CORS error | React must run on `localhost:5173` or `5174`, the only addresses allowed in `api/config.php` |
