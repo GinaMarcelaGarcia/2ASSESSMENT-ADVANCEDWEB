@@ -82,7 +82,7 @@ function Home() {
             and share your reviews
           </p>
 
-          <button className="home-banner-button">
+          <button className="home-banner-button" onClick={() => navigate("/login")}>
             JOIN NOW
           </button>
         </div>
