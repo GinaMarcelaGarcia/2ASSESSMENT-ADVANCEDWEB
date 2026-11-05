@@ -4,7 +4,7 @@ TrackBack is a music album review website. Visitors can browse albums by genre a
 
 INT1059 Advanced Web, AIT Sydney. Group **Dragonfruit**: Gina, Emily and Vinny.
 
-All albums and artists in the database are made up for this project, and the cover images are original.
+All albums and artists in the database are made up for this project.
 
 ---
 
