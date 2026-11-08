@@ -1,15 +1,17 @@
-
+/* Main Random Albums section */
 .random-albums {
   width: 100%;
   padding: 50px 70px 70px;
   box-sizing: border-box;
 }
 
+/* Albums section heading container */
 .albums-heading {
   text-align: center;
   margin-bottom: 35px;
 }
 
+/* Albums section title */
 .albums-heading h2 {
   font-size: 32px;
   font-weight: 800;
@@ -17,6 +19,7 @@
   color: #222;
 }
 
+/* Albums section description */
 .albums-heading p {
   font-size: 20px;
   font-weight: 400;
@@ -24,12 +27,14 @@
   color: #555;
 }
 
+/* Carousel layout and alignment */
 .albums-carousel {
   display: flex;
   align-items: center;
   gap: 18px;
 }
 
+/* Grid layout for album cards */
 .albums-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -38,6 +43,7 @@
   min-width: 0;
 }
 
+/* Individual album card container */
 .album-card {
   position: relative;
   height: 260px;
@@ -45,6 +51,7 @@
   border-radius: 8px;
 }
 
+/* Album cover image styling */
 .album-card img {
   width: 100%;
   height: 100%;
@@ -53,10 +60,12 @@
   transition: transform 0.3s ease;
 }
 
+/* Enlarge album cover when hovering */
 .album-card:hover img {
   transform: scale(1.05);
 }
 
+/* Album title positioned over the cover */
 .album-card h3 {
   position: absolute;
   bottom: 15px;
@@ -73,10 +82,12 @@
   font-weight: bold;
 }
 
+/* Alternative title background for even album cards */
 .album-card:nth-child(even) h3 {
   background: #FDE7AE;
 }
 
+/* Carousel navigation arrow buttons */
 .album-arrow {
   flex-shrink: 0;
   border: none;
@@ -87,27 +98,34 @@
   padding: 8px;
 }
 
+/* Change arrow colour when hovering */
 .album-arrow:hover {
   color: #E69D3C;
 }
 
+/* Responsive layout for tablet and mobile screens */
 @media (max-width: 768px) {
+  /* Reduce section padding on smaller screens */
   .random-albums {
     padding: 30px 20px;
   }
 
+  /* Display two album columns on smaller screens */
   .albums-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  /* Reduce album card height on smaller screens */
   .album-card {
     height: 200px;
   }
 
+  /* Hide album cards after the first two rows */
   .albums-grid .album-card:nth-child(n + 3) {
     display: none;
   }
 
+  /* Reduce spacing around carousel arrows */
   .albums-carousel {
     gap: 6px;
   }
