@@ -120,6 +120,8 @@ function SiteNavbar() {
           <Nav className="align-items-lg-center gap-2">
             {user ? (
               <NavDropdown title={user.username} id="user-menu" align="end">
+                <NavDropdown.Item as={Link} to="/account">My account</NavDropdown.Item>
+                <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>Log out</NavDropdown.Item>
               </NavDropdown>
             ) : (

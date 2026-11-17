@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import AlbumDetail from './pages/AlbumDetail';
+import Account from './pages/Account';
 
 // Layout: navbar on top, page in the middle, footer at the bottom.
 // The <Route> lines are placeholders: each person swaps theirs for the real page component.
@@ -53,7 +54,8 @@ function App() {
           {/* While a modal is open, keep showing the page behind it */}
           <Routes location={isModal ? backgroundPage : location}>
             <Route path="/" element={<Home />} />                     {/* Gina */}
-           <Route path="/album/:id" element={<AlbumDetail />} />    {/* Gina */}
+            <Route path="/album/:id" element={<AlbumDetail />} />    {/* Gina */}
+            <Route path="/account" element={<Account modalOpen={isModal} />} />  {/* Emily */}
             <Route path="*" element={<Container className="py-4"><h1>Page not found</h1></Container>} />
           </Routes>
 
