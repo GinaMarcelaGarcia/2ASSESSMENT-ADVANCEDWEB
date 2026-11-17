@@ -11,6 +11,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import { apiGet, apiPost } from '../api';
+import { useNotify } from '../notification';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
@@ -24,6 +25,7 @@ function SiteNavbar() {
 
   const location = useLocation(); // current page, changes on every navigation
   const navigate = useNavigate(); // lets us change page from code
+  const notify = useNotify();     // message at the top of the screen
   
   // Hamburger menu (small screens): open or closed.
   // It closes by itself when the page changes.
@@ -56,6 +58,7 @@ function SiteNavbar() {
     try {
       await apiPost('logout.php');
       setUser(null);
+      notify('Logged out successfully.');
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);

@@ -5,6 +5,7 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import SiteNavbar from './components/SiteNavbar';
 import SiteFooter from './components/SiteFooter';
+import NotificationProvider from './components/NotificationProvider';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
@@ -44,33 +45,35 @@ function App() {
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <SiteNavbar />
+    <NotificationProvider>
+      <div className="d-flex flex-column min-vh-100">
+        <SiteNavbar />
 
-      <main className="flex-grow-1">
-        {/* Full width, no padding: each page wraps its own content in <Container className="py-4">.
-    Only full width parts (e.g. Home banner) stay outside a Container. */}
-        <Container fluid className="p-0">
-          {/* While a modal is open, keep showing the page behind it */}
-          <Routes location={isModal ? backgroundPage : location}>
-            <Route path="/" element={<Home />} />                     {/* Gina */}
-            <Route path="/album/:id" element={<AlbumDetail />} />    {/* Gina */}
-            <Route path="/account" element={<Account modalOpen={isModal} />} />  {/* Emily */}
-            <Route path="*" element={<Container className="py-4"><h1>Page not found</h1></Container>} />
-          </Routes>
-
-          {/* Login and Register open as a modal */}
-          {isModal && (
-            <Routes>
-              <Route path="/login" element={<Login onClose={closeModal} />} /> {/* Emily */}
-              <Route path="/register" element={<Register onClose={closeModal} />} />  {/* Emily */}
+        <main className="flex-grow-1">
+          {/* Full width, no padding: each page wraps its own content in <Container className="py-4">.
+      Only full width parts (e.g. Home banner) stay outside a Container. */}
+          <Container fluid className="p-0">
+            {/* While a modal is open, keep showing the page behind it */}
+            <Routes location={isModal ? backgroundPage : location}>
+              <Route path="/" element={<Home />} />                     {/* Gina */}
+              <Route path="/album/:id" element={<AlbumDetail />} />    {/* Gina */}
+              <Route path="/account" element={<Account modalOpen={isModal} />} />  {/* Emily */}
+              <Route path="*" element={<Container className="py-4"><h1>Page not found</h1></Container>} />
             </Routes>
-          )}
-        </Container>
-      </main>
 
-      <SiteFooter />
-    </div>
+            {/* Login and Register open as a modal */}
+            {isModal && (
+              <Routes>
+                <Route path="/login" element={<Login onClose={closeModal} />} /> {/* Emily */}
+                <Route path="/register" element={<Register onClose={closeModal} />} />  {/* Emily */}
+              </Routes>
+            )}
+          </Container>
+        </main>
+
+        <SiteFooter />
+      </div>
+    </NotificationProvider>
   );
 }
 

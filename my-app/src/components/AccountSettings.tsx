@@ -9,6 +9,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import PasswordInput from './PasswordInput';
 import { apiGet, apiPost } from '../api';
+import { useNotify } from '../notification';
 
 type AccountDetails = { id: number; username: string; email: string };
 
@@ -90,6 +91,7 @@ function EditableField({ id, label, type, value, onSave }: EditableFieldProps) {
 
 function AccountSettings() {
     const navigate = useNavigate();
+    const notify = useNotify(); // message at the top of the screen
     const [account, setAccount] = useState<AccountDetails | null>(null);
     const [loadError, setLoadError] = useState('');
     const [message, setMessage] = useState(''); // green message after a change
@@ -165,6 +167,7 @@ function AccountSettings() {
     async function handleSignOut() {
         try {
             await apiPost('logout.php');
+            notify('Logged out successfully.');
             navigate('/');
         } catch {
             setLoadError('Could not sign out. Please try again.');
@@ -255,4 +258,4 @@ function AccountSettings() {
     );
 }
 
-export default AccountSettings;
+export default AccountSettings;
