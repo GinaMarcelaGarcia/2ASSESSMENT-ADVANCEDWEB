@@ -24,6 +24,7 @@ function App() {
   // Last normal page visited (stays behind the modal). Starts at Home.
   const [backgroundPage, setBackgroundPage] = useState('/');
   const currentPage = location.pathname + location.search;
+  const backgroundPath = backgroundPage.split('?')[0];
 
   // On a normal page, remember it as the background
   if (!isModal && backgroundPage !== currentPage) {
@@ -32,9 +33,9 @@ function App() {
 
   // When the page behind changes (e.g. Home -> Album), start at the top.
   // Opening or closing a modal does not change it, so the page stays where it was.
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [backgroundPage]);
+ useEffect(() => {
+  window.scrollTo(0, 0);
+}, [backgroundPath]);
 
   // Closing the modal goes back to the page behind it
   function closeModal() {

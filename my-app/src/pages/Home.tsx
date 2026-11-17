@@ -12,6 +12,9 @@ function Home() {
   const [exploreAlbums, setExploreAlbums] = useState<Album[]>([]);
   // Gallery: albums of the chosen genre (or random if no genre)
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [searchResults, setSearchResults] = useState<Album[]>([]);
+const [searchError, setSearchError] = useState("");
+const [searchPerformed, setSearchPerformed] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [artist, setArtist] = useState("");
   const [year, setYear] = useState("");
@@ -23,6 +26,7 @@ function Home() {
   // and the dropdown on this page always show the same thing
   const [searchParams, setSearchParams] = useSearchParams();
   const genreId = searchParams.get("genre") ?? "";
+  const searchQuery = searchParams.get("search") ?? "";
 
   // Load once: carousel albums + full genre list from the database
   useEffect(() => {
@@ -35,24 +39,61 @@ function Home() {
       .catch((err: Error) => setError(err.message));
   }, []);
 
-  // Load the gallery again every time the genre in the URL changes
+  
+
+  // Load the gallery again only when the genre changes
   useEffect(() => {
-    const path = genreId ? `albums.php?genre=${genreId}` : "albums.php";
+    const path = genreId
+      ? `albums.php?genre=${genreId}`
+      : "albums.php";
 
     apiGet<Album[]>(path)
       .then((data) => {
         setAlbums(data);
-        setArtist(""); // old artist/year may not exist in the new genre
+        setArtist("");
         setYear("");
+        setVisibleAlbums(8);
         setError("");
       })
       .catch((err: Error) => setError(err.message));
   }, [genreId]);
 
+  // Load search results independently from the gallery
+useEffect(() => {
+  const query = searchQuery.trim();
+
+  if (!query) {
+    setSearchResults([]);
+    setSearchError("");
+    setSearchPerformed(false);
+    return;
+  }
+
+  setSearchPerformed(true);
+  setSearchError("");
+
+  apiGet<Album[]>(`albums.php?search=${encodeURIComponent(query)}`)
+    .then((data) => {
+      setSearchResults(data);
+    })
+    .catch((err: Error) => {
+      setSearchResults([]);
+      setSearchError(err.message);
+    });
+}, [searchQuery]);
+
   // Changing the dropdown only changes the URL; the effect above does the rest
-  const changeGenre = (value: string) => {
-    setSearchParams(value ? { genre: value } : {});
-  };
+ const changeGenre = (value: string) => {
+  const params = new URLSearchParams(searchParams);
+
+  if (value) {
+    params.set("genre", value);
+  } else {
+    params.delete("genre");
+  }
+
+  setSearchParams(params, { preventScrollReset: true });
+};
 
   // Artist and year options come from the albums already loaded (client-side)
   const artists = [...new Set(albums.map((album) => album.artist))].sort();
@@ -87,6 +128,50 @@ function Home() {
           </button>
         </div>
       </section>
+
+      {/* SECTION SEARCH RESULTS */}
+
+          {searchPerformed && (
+        <section className="search-results">
+          <h2>Search Results</h2>
+          <p>Results for "{searchQuery}"</p>
+
+          {searchError ? (
+            <p className="text-danger">{searchError}</p>
+          ) : searchResults.length === 0 ? (
+            <p>No results found for "{searchQuery}".</p>
+          ) : (
+            <div className="gallery-grid">
+              {searchResults.map((album) => (
+                <div
+                  className="gallery-card"
+                  key={album.id}
+                  onClick={() => navigate(`/album/${album.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="gallery-cover">
+                    <img
+                      src={`${IMAGES_URL}/${album.cover_image}`}
+                      alt={album.title}
+                    />
+                    <h3>{album.title}</h3>
+                  </div>
+
+                  <p>{album.artist}</p>
+                  <span>{album.year}</span>
+
+                  <div className="gallery-rating">
+                    {album.avg_rating !== null
+                      ? `★ ${album.avg_rating} (${album.review_count})`
+                      : "No reviews yet"}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
 
       {error ? (
         <Container className="py-4">

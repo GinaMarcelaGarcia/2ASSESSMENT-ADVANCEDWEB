@@ -9,8 +9,12 @@
 }
 
 /* Navbar */
+/*Increase the orange box*/
 .tb-navbar {
   background-color: var(--tb-primary);
+  min-height: 85px;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .tb-navbar .navbar-brand {
@@ -46,4 +50,59 @@
 
 .tb-footer a:hover {
   text-decoration: underline;
+}
+
+
+
+/* Search bar in the centre of the Navbar */
+.tb-search-form {
+  flex: 1;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.tb-search-form .form-control {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #555555;
+  border: none;
+  border-radius: 20px 0 0 20px;
+  padding: 10px 16px;
+  box-shadow: none;
+}
+
+.tb-search-form .form-control::placeholder {
+  color: #888888;
+  opacity: 1;
+}
+
+.tb-search-form .input-group-text {
+  background-color: #FFFFFF;
+  border: none;
+  border-radius: 0 20px 20px 0;
+  color: var(--tb-primary);
+  padding: 10px 16px;
+}
+
+
+/* Keep the navigation items aligned */
+@media (min-width: 992px) {
+  .tb-navbar .navbar-collapse {
+    align-items: center;
+  }
+
+  .tb-navbar .navbar-collapse > .navbar-nav:first-child {
+    margin-right: 20px !important;
+  }
+
+  .tb-navbar .navbar-collapse > .navbar-nav:last-child {
+    margin-left: 20px;
+  }
+}
+
+/* Search bar on smaller screens */
+@media (max-width: 991px) {
+  .tb-search-form {
+    max-width: 100%;
+    margin: 12px 0;
+  }
 }

@@ -11,6 +11,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import { apiGet, apiPost } from '../api';
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 type Genre = { id: number; name: string };
 type User = { id: number; username: string };
@@ -18,6 +20,7 @@ type User = { id: number; username: string };
 function SiteNavbar() {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [searchText, setSearchText] = useState("");
 
   const location = useLocation(); // current page, changes on every navigation
   const navigate = useNavigate(); // lets us change page from code
@@ -78,6 +81,40 @@ function SiteNavbar() {
               ))}
             </NavDropdown>
           </Nav>
+
+          
+{/* Search bar in the centre */}
+<Form
+  className="tb-search-form"
+  onSubmit={(event) => {
+  event.preventDefault();
+
+  const query = searchText.trim();
+  const params = new URLSearchParams(location.search);
+
+  if (query) {
+    params.set("search", query);
+  } else {
+    params.delete("search");
+  }
+
+  navigate(params.toString() ? `/?${params.toString()}` : "/");
+}}
+>
+  <InputGroup>
+    <Form.Control
+      type="search"
+      placeholder="Search albums, artists..."
+      aria-label="Search albums and artists"
+      value={searchText}
+      onChange={(event) => setSearchText(event.target.value)}
+    />
+    <Button type="submit" variant="light" aria-label="Search">
+      <i className="bi bi-search"></i>
+    </Button>
+  </InputGroup>
+</Form>
+ 
 
           {/* Right side: changes with the login */}
           <Nav className="align-items-lg-center gap-2">

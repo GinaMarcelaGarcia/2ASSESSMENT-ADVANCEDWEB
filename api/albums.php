@@ -104,11 +104,16 @@ if (isset($_GET['popular'])) {
     sendJson($albums);
 }
 
-// ---------------------------------------------------------------------
-// List of albums: genre filter or Home page
-// ---------------------------------------------------------------------
-if (isset($_GET['genre'])) {
 
+// ---------------------------------------------------------------------
+// List of albums: search, genre filter or Home page
+// ---------------------------------------------------------------------
+
+$conditions = [];
+$params = [];
+
+// Optional genre filter
+if (isset($_GET['genre'])) {
     $genreId = filter_var($_GET['genre'], FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1]
     ]);
@@ -117,47 +122,54 @@ if (isset($_GET['genre'])) {
         sendError('Invalid genre id.', 400);
     }
 
-    $stmt = $pdo->prepare('
-        SELECT a.id, a.title,
-               ar.name AS artist,
-               g.name AS genre,
-               YEAR(a.release_date) AS year,
-               a.cover_image,
-               ROUND(AVG(r.rating), 1) AS avg_rating,
-               COUNT(r.id) AS review_count
-        FROM albums a
-        JOIN artists ar ON ar.id = a.artist_id
-        JOIN genres g ON g.id = a.genre_id
-        LEFT JOIN reviews r ON r.album_id = a.id
-        WHERE a.genre_id = :genre
-        GROUP BY a.id
-        ORDER BY RAND()
-        LIMIT 28
-    ');
-
-    $stmt->execute(['genre' => $genreId]);
-
-} else {
-
-    $stmt = $pdo->prepare('
-        SELECT a.id, a.title,
-               ar.name AS artist,
-               g.name AS genre,
-               YEAR(a.release_date) AS year,
-               a.cover_image,
-               ROUND(AVG(r.rating), 1) AS avg_rating,
-               COUNT(r.id) AS review_count
-        FROM albums a
-        JOIN artists ar ON ar.id = a.artist_id
-        JOIN genres g ON g.id = a.genre_id
-        LEFT JOIN reviews r ON r.album_id = a.id
-        GROUP BY a.id
-        ORDER BY RAND()
-        LIMIT 28
-    ');
-
-    $stmt->execute();
+    $conditions[] = 'a.genre_id = :genre';
+    $params['genre'] = $genreId;
 }
+
+// Optional search by album title, artist or genre name
+if (isset($_GET['search']) && trim($_GET['search']) !== '') {
+    $search = trim($_GET['search']);
+
+    $conditions[] = '(
+        a.title LIKE :search_title
+        OR ar.name LIKE :search_artist
+        OR g.name LIKE :search_genre
+    )';
+
+    $searchTerm = '%' . $search . '%';
+
+    $params['search_title'] = $searchTerm;
+    $params['search_artist'] = $searchTerm;
+    $params['search_genre'] = $searchTerm;
+}
+
+// Build the WHERE clause only when filters are present
+$where = '';
+
+if (!empty($conditions)) {
+    $where = 'WHERE ' . implode(' AND ', $conditions);
+}
+
+$sql = "
+    SELECT a.id, a.title,
+           ar.name AS artist,
+           g.name AS genre,
+           YEAR(a.release_date) AS year,
+           a.cover_image,
+           ROUND(AVG(r.rating), 1) AS avg_rating,
+           COUNT(r.id) AS review_count
+    FROM albums a
+    JOIN artists ar ON ar.id = a.artist_id
+    JOIN genres g ON g.id = a.genre_id
+    LEFT JOIN reviews r ON r.album_id = a.id
+    $where
+    GROUP BY a.id
+    ORDER BY RAND()
+    LIMIT 28
+";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 
 $albums = $stmt->fetchAll();
 $albums = array_map('fixRating', $albums);
