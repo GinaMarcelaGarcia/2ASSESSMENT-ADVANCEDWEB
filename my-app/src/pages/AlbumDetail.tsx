@@ -5,6 +5,7 @@ import "./AlbumDetail.css";
 import { apiGet, IMAGES_URL } from "../api";
 import RandomAlbums from "./RandomAlbums";
 import type { Album, AlbumReview } from "../types";
+import ReviewModal from "../components/ReviewModal";
 
 type AlbumDetailsData = {
   id: number;
@@ -51,6 +52,11 @@ function AlbumDetail() {
   const [reviewsError, setReviewsError] = useState("");
   const [reviewIndex, setReviewIndex] = useState(0);
 
+    // Goes up by 1 after a review is saved: the album and the reviews load again
+  const [reloadKey, setReloadKey] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [modalReview, setModalReview] = useState<AlbumReview | null>(null);
+
   // Shows 2 cards at a time. With 2 or fewer reviews, shows all of them.
   const visibleReviews =
     reviews.length <= 2
@@ -65,8 +71,8 @@ function AlbumDetail() {
     apiGet<AlbumDetailsData>(`albums.php?id=${id}`)
       .then((data) => setAlbum(data))
       .catch((err: Error) => setError(err.message));
-  }, [id]);
-  
+  }, [id, reloadKey]);
+
     /* ALBUM REVIEWS */
 
   useEffect(() => {
@@ -78,7 +84,7 @@ function AlbumDetail() {
         setReviewIndex(0); // other album: start again from the first card
       })
       .catch((err: Error) => setReviewsError(err.message));
-  }, [id]);
+  }, [id, reloadKey]);
 
   /* POPULAR ALBUMS */
 
@@ -95,6 +101,29 @@ function AlbumDetail() {
       .then((data) => setRandomAlbums(data))
       .catch((err: Error) => setError(err.message));
   }, []);
+
+  /* WRITE A REVIEW */
+
+  async function openReviewModal() {
+    try {
+      // Asks PHP who is logged in right now
+      const user = await apiGet<{ id: number; username: string } | null>("me.php");
+      if (!user) {
+        navigate("/login"); // opens the login modal on top of this page
+        return;
+      }
+      // One review per album: if this user already has one, the modal edits it
+      setModalReview(reviews.find((review) => review.user_id === user.id) ?? null);
+      setShowReviewModal(true);
+    } catch (err) {
+      setReviewsError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  function handleReviewSaved() {
+    setShowReviewModal(false);
+    setReloadKey((key) => key + 1);
+  }
 
   if (error) return <p>{error}</p>;
   if (!album) return <p>Loading album...</p>;
@@ -182,7 +211,7 @@ function AlbumDetail() {
           <div className="write-review-container">
             <span className="write-review-star">⭐</span>
 
-            <button className="write-review-button" type="button">
+            <button className="write-review-button" type="button" onClick={openReviewModal}>
               Write a review
             </button>
           </div>
@@ -337,6 +366,16 @@ function AlbumDetail() {
         albums={randomAlbums}
         title="You might also like"
       />
+
+            {/* Rendered only while open, so the form always starts fresh */}
+      {showReviewModal && (
+        <ReviewModal
+          album={album}
+          existingReview={modalReview}
+          onClose={() => setShowReviewModal(false)}
+          onSaved={handleReviewSaved}
+        />
+      )}
 
     </div>
   );
