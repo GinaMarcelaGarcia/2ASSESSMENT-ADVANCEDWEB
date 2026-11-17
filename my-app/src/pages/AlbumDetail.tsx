@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router";
 import "./AlbumDetail.css";
 import { apiGet, IMAGES_URL } from "../api";
 import RandomAlbums from "./RandomAlbums";
-import type { Album } from "../types";
+import type { Album, AlbumReview } from "../types";
 
 type AlbumDetailsData = {
   id: number;
@@ -25,48 +25,14 @@ type AlbumDetailsData = {
 
 /* REVIEWS */
 
-type Review = {
-  id: number;
-  name: string;
-  photo: string;
-  date: string;
-  rating: number;
-  comment: string;
-  favouriteAlbum: string;
-};
-
-const reviewData: Review[] = [
-  {
-    id: 1,
-    name: "Joe Doe",
-    photo: "/1PhotoReview.png",
-    date: "25 Sep 2026",
-    rating: 5,
-    comment:
-      "Update (after seeing the opinions of others): Y'all won't be happy with ANYTHING OMG, if any other artist released these four tracks y'all wouldn't shut up about how good they are. 🫩",
-    favouriteAlbum: "Lunar Dust"
-  },
-  {
-    id: 2,
-    name: "Luisa Elz",
-    photo: "/2PhotoReview.png",
-    date: "26 Sep 2026",
-    rating: 5,
-    comment:
-      "Honestly, I didn’t expect to enjoy this album as much as I did. Some of the songs are definitely more playful than what I usually listen to, but I think that’s what makes it fun.",
-    favouriteAlbum: "Velvet Hours"
-  },
-];
-
-const reviews: Review[] = [
-  ...reviewData,
-  ...reviewData,
-  ...reviewData,
-].map((review, index) => ({
-  ...review,
-  id: index + 1,
-}));
-
+// "2026-11-17 18:39:50" (MySQL format) -> "17 Nov 2026"
+function formatDate(mysqlDate: string) {
+  return new Date(mysqlDate.replace(" ", "T")).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 /* END REVIEWS */
 
 function AlbumDetail() {
@@ -79,16 +45,19 @@ function AlbumDetail() {
   const [randomAlbums, setRandomAlbums] = useState<Album[]>([]);
   const [popularPage, setPopularPage] = useState(1);
 
-  /* REVIEW NAVIGATION */
+    /* REVIEWS */
 
+  const [reviews, setReviews] = useState<AlbumReview[]>([]);
+  const [reviewsError, setReviewsError] = useState("");
   const [reviewIndex, setReviewIndex] = useState(0);
 
-  const visibleReviews = [
-    reviews[reviewIndex],
-    reviews[(reviewIndex + 1) % reviews.length],
-  ];
+  // Shows 2 cards at a time. With 2 or fewer reviews, shows all of them.
+  const visibleReviews =
+    reviews.length <= 2
+      ? reviews
+      : [reviews[reviewIndex], reviews[(reviewIndex + 1) % reviews.length]];
 
-  /* ALBUM DETAILS */
+        /* ALBUM DETAILS */
 
   useEffect(() => {
     if (!id) return;
@@ -96,6 +65,19 @@ function AlbumDetail() {
     apiGet<AlbumDetailsData>(`albums.php?id=${id}`)
       .then((data) => setAlbum(data))
       .catch((err: Error) => setError(err.message));
+  }, [id]);
+  
+    /* ALBUM REVIEWS */
+
+  useEffect(() => {
+    if (!id) return;
+
+    apiGet<AlbumReview[]>(`reviews.php?album=${id}`)
+      .then((data) => {
+        setReviews(data);
+        setReviewIndex(0); // other album: start again from the first card
+      })
+      .catch((err: Error) => setReviewsError(err.message));
   }, [id]);
 
   /* POPULAR ALBUMS */
@@ -266,84 +248,86 @@ function AlbumDetail() {
         <h2>Album Reviews</h2>
       </div>
 
-      <section className="album-reviews-container">
+            <section className="album-reviews-container">
 
-        {/* LEFT ARROW */}
+        {reviewsError && <p>{reviewsError}</p>}
 
-        <button
-          className="reviews-arrow reviews-arrow-left"
-          type="button"
-          onClick={() =>
-            setReviewIndex((prev) =>
-              (prev - 1 + reviews.length) % reviews.length
-            )
-          }
-          aria-label="Previous reviews"
-        >
-          &#10094;
-        </button>
+        {!reviewsError && reviews.length === 0 && (
+          <p className="album-no-reviews">No reviews yet. Be the first to review this album!</p>
+        )}
+
+        {/* LEFT ARROW: only when there are more than 2 reviews */}
+
+        {reviews.length > 2 && (
+          <button
+            className="reviews-arrow reviews-arrow-left"
+            type="button"
+            onClick={() =>
+              setReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length)
+            }
+            aria-label="Previous reviews"
+          >
+            &#10094;
+          </button>
+        )}
 
         {/* REVIEW CARDS */}
 
-        <div className="reviews-grid">
+        {reviews.length > 0 && (
+          <div className="reviews-grid">
+            {visibleReviews.map((review) => (
+              <article className="review-card" key={review.id}>
 
-          {visibleReviews.map((review) => (
-            <article className="review-card" key={review.id}>
+                <div className="review-user-info">
 
-              <div className="review-user-info">
-
-                <img
-                  className="review-user-photo"
-                  src={review.photo}
-                  alt={review.name}
-                />
-
-                <div className="review-user-details">
-
-                  <h3>Review by {review.name}</h3>
-
-                  <div className="review-stars">
-                    {"★".repeat(review.rating)}
+                  {/* No profile photo yet: shows the first letter of the username */}
+                  <div className="review-user-photo review-user-initial">
+                    {review.username.charAt(0).toUpperCase()}
                   </div>
 
-                  <p className="review-date">
-                    Reviewed on {review.date}
-                  </p>
+                  <div className="review-user-details">
+                    <h3>Review by {review.username}</h3>
+
+                    <div className="review-stars">
+                      {"★".repeat(review.rating)}
+                      {"☆".repeat(5 - review.rating)}
+                    </div>
+
+                    <p className="review-date">
+                      Reviewed on {formatDate(review.created_at)}
+                    </p>
+                  </div>
 
                 </div>
 
-              </div>
+                <div className="review-comment">
+                  <p><strong>{review.title}</strong></p>
+                  <p>{review.body}</p>
 
-              <div className="review-comment">
+                  {review.listened_at && (
+                    <p><strong>Listened on:</strong> {formatDate(review.listened_at)}</p>
+                  )}
+                </div>
 
-                <p>{review.comment}</p>
-
-                <p>
-                  <strong>Favourite Album:</strong>{" "}
-                  {review.favouriteAlbum}
-                </p>
-
-              </div>
-
-            </article>
-          ))}
-
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         {/* RIGHT ARROW */}
 
-        <button
-          className="reviews-arrow reviews-arrow-right"
-          type="button"
-          onClick={() =>
-            setReviewIndex((prev) =>
-              (prev + 1) % reviews.length
-            )
-          }
-          aria-label="Next reviews"
-        >
-          &#10095;
-        </button>
+        {reviews.length > 2 && (
+          <button
+            className="reviews-arrow reviews-arrow-right"
+            type="button"
+            onClick={() =>
+              setReviewIndex((prev) => (prev + 1) % reviews.length)
+            }
+            aria-label="Next reviews"
+          >
+            &#10095;
+          </button>
+        )}
 
       </section>
 
@@ -359,3 +343,4 @@ function AlbumDetail() {
 }
 
 export default AlbumDetail;
+

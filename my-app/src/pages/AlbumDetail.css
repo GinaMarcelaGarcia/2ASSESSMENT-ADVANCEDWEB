@@ -655,3 +655,14 @@
   }
 
 }
+
+/* Circle with the first letter, while users have no profile photo */
+.review-user-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #C1330F;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+}
