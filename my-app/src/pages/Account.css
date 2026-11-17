@@ -22,3 +22,12 @@
     color: var(--tb-primary);
     font-weight: 600;
 }
+
+/* White boxes used in the Account Settings tab */
+.account-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}

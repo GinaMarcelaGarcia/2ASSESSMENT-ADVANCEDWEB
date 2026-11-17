@@ -178,62 +178,80 @@ function AccountSettings() {
         return <p className="text-muted">Loading...</p>;
     }
 
-    return (
-        <div style={{ maxWidth: '420px' }}>
+        return (
+        <>
             {message && <div className="alert alert-success py-2 small">{message}</div>}
 
-            <EditableField
-                id="account-username"
-                label="Username"
-                type="text"
-                value={account.username}
-                onSave={saveUsername}
-            />
+            <div className="row g-4">
+                {/* Left card: profile details */}
+                <div className="col-6">
+                    <section className="account-card h-100">
+                        <h2 className="h5 fw-bold mb-1">Profile details</h2>
+                        <p className="text-muted small mb-4">Click the pencil to change your username or e-mail.</p>
 
-            <EditableField
-                id="account-email"
-                label="Email"
-                type="email"
-                value={account.email}
-                onSave={saveEmail}
-            />
+                        <EditableField
+                            id="account-username"
+                            label="Username"
+                            type="text"
+                            value={account.username}
+                            onSave={saveUsername}
+                        />
 
-            {/* Change password: the button opens a small form */}
-            {showPasswordForm ? (
-                <form onSubmit={handlePasswordSubmit} noValidate className="border rounded-4 p-3 mt-4">
-                    <h2 className="h6 fw-bold mb-3">Change password</h2>
+                        <EditableField
+                            id="account-email"
+                            label="Email"
+                            type="email"
+                            value={account.email}
+                            onSave={saveEmail}
+                        />
+                    </section>
+                </div>
 
-                    {passwordError && <div className="alert alert-danger py-2 small">{passwordError}</div>}
+                {/* Right card: password and sign out */}
+                <div className="col-6">
+                    <section className="account-card h-100">
+                        <h2 className="h5 fw-bold mb-1">Password and security</h2>
+                        <p className="text-muted small mb-4">You need your current password to set a new one.</p>
 
-                    <div className="mb-2">
-                        <PasswordInput id="currentPassword" placeholder="Current password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-                    </div>
-                    <div className="mb-2">
-                        <PasswordInput id="newPassword" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                    </div>
-                    <div className="mb-3">
-                        <PasswordInput id="confirmNewPassword" placeholder="Repeat new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                    </div>
+                        {/* Change password: the button opens a small form */}
+                        {showPasswordForm ? (
+                            <form onSubmit={handlePasswordSubmit} noValidate>
+                                {passwordError && <div className="alert alert-danger py-2 small">{passwordError}</div>}
 
-                    <div className="d-flex gap-2">
-                        <button type="submit" className="btn text-white rounded-pill px-4" style={{ backgroundColor: 'var(--tb-primary)' }} disabled={savingPassword}>
-                            {savingPassword ? 'Saving...' : 'Save password'}
+                                <div className="mb-2">
+                                    <PasswordInput id="currentPassword" placeholder="Current password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                                </div>
+                                <div className="mb-2">
+                                    <PasswordInput id="newPassword" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                                </div>
+                                <div className="mb-3">
+                                    <PasswordInput id="confirmNewPassword" placeholder="Repeat new password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                </div>
+
+                                <div className="d-flex gap-2">
+                                    <button type="submit" className="btn text-white rounded-pill px-4" style={{ backgroundColor: 'var(--tb-primary)' }} disabled={savingPassword}>
+                                        {savingPassword ? 'Saving...' : 'Save password'}
+                                    </button>
+                                    <button type="button" className="btn btn-outline-secondary rounded-pill px-4" onClick={closePasswordForm} disabled={savingPassword}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <button type="button" className="btn text-white rounded-pill px-4" style={{ backgroundColor: 'var(--tb-primary)' }} onClick={() => { setMessage(''); setShowPasswordForm(true); }}>
+                                Change password
+                            </button>
+                        )}
+
+                        <hr className="my-4" />
+
+                        <button type="button" className="btn rounded-pill px-4" style={{ border: '1px solid var(--tb-primary)', color: 'var(--tb-primary)' }} onClick={handleSignOut}>
+                            Sign out
                         </button>
-                        <button type="button" className="btn btn-outline-secondary rounded-pill px-4" onClick={closePasswordForm} disabled={savingPassword}>
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            ) : (
-                <button type="button" className="btn text-white rounded-pill w-100 mt-4" style={{ backgroundColor: 'var(--tb-primary)' }} onClick={() => { setMessage(''); setShowPasswordForm(true); }}>
-                    Change password
-                </button>
-            )}
-
-            <button type="button" className="btn rounded-pill w-100 mt-3" style={{ border: '1px solid var(--tb-primary)', color: 'var(--tb-primary)' }} onClick={handleSignOut}>
-                Sign out
-            </button>
-        </div>
+                    </section>
+                </div>
+            </div>
+        </>
     );
 }
 
