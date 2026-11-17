@@ -11,6 +11,46 @@ require_once __DIR__ . '/config.php';
 $pdo = getDB();
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Checks the fields of a review (used by POST and PUT).
+// Sends a 400 error if something is wrong, otherwise returns the clean values.
+function validateReview($data)
+{
+    $rating = filter_var($data['rating'] ?? null, FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1, 'max_range' => 5]]);
+    if ($rating === false) {
+        sendError('Rating must be a whole number from 1 to 5.', 400);
+    }
+
+    $title = trim((string) ($data['title'] ?? ''));
+    if ($title === '' || mb_strlen($title) > 100) {
+        sendError('Title is required (max 100 characters).', 400);
+    }
+
+    $body = trim((string) ($data['body'] ?? ''));
+    if ($body === '' || mb_strlen($body) > 2000) {
+        sendError('Review text is required (max 2000 characters).', 400);
+    }
+
+    // "Listened at" is optional. Empty means NULL in the database.
+    $listenedAt = trim((string) ($data['listened_at'] ?? ''));
+    if ($listenedAt === '') {
+        $listenedAt = null;
+    } else {
+        // Only a real date like 2026-11-17, and not in the future
+        $date = DateTime::createFromFormat('Y-m-d', $listenedAt);
+        if ($date === false || $date->format('Y-m-d') !== $listenedAt || $listenedAt > date('Y-m-d')) {
+            sendError('Listened at must be a valid date, not in the future.', 400);
+        }
+    }
+
+    return [
+        'rating' => $rating,
+        'title' => $title,
+        'body' => $body,
+        'listened_at' => $listenedAt,
+    ];
+}
+
 // ---------------------------------------------------------------------
 // GET ?album=5 : reviews of one album
 // ---------------------------------------------------------------------
@@ -59,6 +99,53 @@ if ($method === 'GET' && isset($_GET['mine'])) {
     $stmt->execute(['user' => $userId]);
 
     sendJson($stmt->fetchAll());
+}
+
+// ---------------------------------------------------------------------
+// POST : create a review
+// Body (JSON): { album_id, rating, title, body, listened_at (optional) }
+// ---------------------------------------------------------------------
+if ($method === 'POST') {
+    $userId = requireLogin();
+    $data = getJsonBody();
+
+    $albumId = filter_var($data['album_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($albumId === false) {
+        sendError('Invalid album id.', 400);
+    }
+    $review = validateReview($data);
+
+    // The album must exist. Gives a clear 404 instead of a database error.
+    $check = $pdo->prepare('SELECT id FROM albums WHERE id = :id');
+    $check->execute(['id' => $albumId]);
+    if ($check->fetch() === false) {
+        sendError('Album not found.', 404);
+    }
+
+    try {
+        $stmt = $pdo->prepare('
+            INSERT INTO reviews (user_id, album_id, rating, title, body, listened_at)
+            VALUES (:user, :album, :rating, :title, :body, :listened_at)
+        ');
+        $stmt->execute([
+            'user' => $userId, // from the session, never from the body
+            'album' => $albumId,
+            'rating' => $review['rating'],
+            'title' => $review['title'],
+            'body' => $review['body'],
+            'listened_at' => $review['listened_at'],
+        ]);
+    } catch (PDOException $e) {
+        // 23000 = the UNIQUE (user_id, album_id) rule broke:
+        // this user already has a review for this album
+        if ($e->getCode() === '23000') {
+            sendError('You already reviewed this album. You can edit your review instead.', 409);
+        }
+        throw $e; // any other error goes to the safety net in config.php
+    }
+
+    // 201 = "created". We send back the new id.
+    sendJson(['id' => (int) $pdo->lastInsertId()], 201);
 }
 
 // No case above matched this request
