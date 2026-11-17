@@ -154,4 +154,4 @@ function Register({ onClose }: RegisterProps) {
     );
 }
 
-export default Register;
+export default Register;
