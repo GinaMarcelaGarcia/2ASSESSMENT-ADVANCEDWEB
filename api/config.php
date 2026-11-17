@@ -60,3 +60,14 @@ function getJsonBody()
     // Empty body or broken JSON: return an empty array, the endpoint validates the fields
     return is_array($data) ? $data : [];
 }
+
+// Stops the request with 401 when nobody is logged in.
+// Returns the id of the logged user.
+// Usage: $userId = requireLogin();
+function requireLogin()
+{
+    if (!isset($_SESSION['user_id'])) {
+        sendError('You need to sign in first.', 401);
+    }
+    return (int) $_SESSION['user_id'];
+}
