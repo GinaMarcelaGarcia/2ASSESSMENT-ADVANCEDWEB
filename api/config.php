@@ -11,6 +11,9 @@ ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
+// The site is for Sydney: date() uses Sydney time, not the server default
+date_default_timezone_set('Australia/Sydney');
+
 // Safety net: any exception nobody caught becomes a clean JSON error.
 set_exception_handler(function ($e) {
     error_log($e->getMessage());
