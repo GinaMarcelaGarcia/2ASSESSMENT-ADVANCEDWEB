@@ -102,3 +102,31 @@ input[type="password"]::-ms-clear {
 .reviews-arrow:hover {
   color: #B95725;
 }
+
+/* Check mark that draws itself after signing in / creating an account */
+.auth-check {
+    width: 72px;
+    height: 72px;
+}
+
+.auth-check-circle {
+    stroke: var(--tb-primary);
+    stroke-width: 3;
+    stroke-dasharray: 151;  /* length of the circle line */
+    stroke-dashoffset: 151; /* starts hidden */
+    animation: auth-draw 0.5s ease-out forwards;
+}
+
+.auth-check-mark {
+    stroke: var(--tb-primary);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: auth-draw 0.35s 0.45s ease-out forwards; /* starts after the circle */
+}
+
+@keyframes auth-draw {
+    to { stroke-dashoffset: 0; } /* line fully drawn */
+}

@@ -1,0 +1,33 @@
+/* Account page (My reviews / My favourites / Account Settings) */
+
+.account-subtitle {
+    color: #6c757d;
+}
+
+/* The 3 tabs: rounded outline buttons, like the Figma mockup */
+.account-tab {
+    border: 1px solid #ced4da;
+    color: #6c757d;
+    background-color: #fff;
+}
+
+.account-tab:hover {
+    border-color: var(--tb-primary);
+    color: var(--tb-primary);
+}
+
+/* Tab that is open now */
+.account-tab.active {
+    border-color: var(--tb-primary);
+    color: var(--tb-primary);
+    font-weight: 600;
+}
+
+/* White boxes used in the Account Settings tab */
+.account-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}

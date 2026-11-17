@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import Modal from 'react-bootstrap/Modal';
 import PasswordInput from '../components/PasswordInput';
 import { apiPost } from '../api';
+import AuthSuccess from '../components/AuthSuccess';
 import './auth.css';
 
 type RegisterErrors = {
@@ -25,6 +26,7 @@ function Register({ onClose }: RegisterProps) {
     const [errors, setErrors] = useState<RegisterErrors>({});
     const [serverError, setServerError] = useState(''); // message that comes from the PHP API
     const [loading, setLoading] = useState(false);       // true while waiting for the PHP answer
+    const [welcomeName, setWelcomeName] = useState(''); // filled after the account is created
 
     function validate(): RegisterErrors {
         const newErrors: RegisterErrors = {};
@@ -60,8 +62,9 @@ function Register({ onClose }: RegisterProps) {
         setLoading(true);
         try {
             // send the new account to api/register.php (confirmPassword is only checked here in React)
-            await apiPost('register.php', { username: username.trim(), email: email.trim(), password });
-            onClose(); // account created and signed in: close the modal, the navbar shows the user
+            const user = await apiPost<{ id: number; username: string }>('register.php', { username: username.trim(), email: email.trim(), password });
+            setWelcomeName(user.username); // shows the check mark and the welcome message
+            setTimeout(onClose, 1400);     // then closes the modal; the navbar shows the user
         } catch (error) {
             // e.g. "This e-mail already has an account." or "Could not reach the server."
             setServerError(error instanceof Error ? error.message : 'Something went wrong.');
@@ -77,6 +80,10 @@ function Register({ onClose }: RegisterProps) {
                 </Modal.Header>
 
                 <Modal.Body className="p-4">
+                    {welcomeName ? (
+                        <AuthSuccess title={`Welcome, ${welcomeName}!`} subtitle="Your account is ready." />
+                    ) : (
+                    <>
                     <h1 className="h4 text-center fw-bold">Create Account</h1>
                     <p className="text-center small">
                         Already have an account? <Link to="/login" style={{ color: 'var(--tb-primary)' }}>Sign in</Link>
@@ -135,10 +142,13 @@ function Register({ onClose }: RegisterProps) {
 
                         <div className="text-center">
                             <button type="submit" className="btn text-white rounded-pill px-5" style={{ backgroundColor: 'var(--tb-primary)' }} disabled={loading}>
+                                {loading && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>}
                                 {loading ? 'Creating account...' : 'Sign Up'}
                             </button>
                         </div>
                     </form>
+                    </>
+                    )}
                 </Modal.Body>
         </Modal>
     );
