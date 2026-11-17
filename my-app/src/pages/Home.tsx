@@ -132,8 +132,21 @@ useEffect(() => {
       {/* SECTION SEARCH RESULTS */}
 
           {searchPerformed && (
-        <section className="search-results">
-          <h2>Search Results</h2>
+          <section className="search-results">
+             <button
+             type="button"
+             className="close-search-results"
+             aria-label="Close search results"
+             onClick={() => {
+               const params = new URLSearchParams(searchParams);
+               params.delete("search");
+               setSearchParams(params, { preventScrollReset: true });
+    }}
+  >
+    ×
+  </button>
+
+  <h2>Search Results</h2>
           <p>Results for "{searchQuery}"</p>
 
           {searchError ? (

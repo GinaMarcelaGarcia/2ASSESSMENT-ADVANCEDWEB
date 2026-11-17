@@ -370,3 +370,24 @@
     padding: 30px 20px;
   }
 }
+
+.search-results {
+  position: relative;
+}
+
+.close-search-results {
+  position: absolute;
+  top: 25px;
+  right: 100px;
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-search-results:hover {
+  color: #C1330F;
+}
