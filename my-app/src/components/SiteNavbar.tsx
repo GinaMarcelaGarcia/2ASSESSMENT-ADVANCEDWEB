@@ -44,11 +44,13 @@ function SiteNavbar() {
 
   // Ask PHP who is logged in every time the page changes.
   // So after Login sends the user to another page, the navbar updates by itself.
+  // location.key changes on every navigation, even to the same URL
+  // (e.g. after changing the username on the account page).
   useEffect(() => {
     apiGet<User | null>('me.php')
       .then(setUser)
       .catch(() => setUser(null));
-  }, [location.pathname]);
+    }, [location.key]);
 
   async function handleLogout() {
     try {

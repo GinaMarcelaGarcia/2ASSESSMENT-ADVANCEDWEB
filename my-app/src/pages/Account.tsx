@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import { apiGet } from '../api';
+import AccountSettings from '../components/AccountSettings';
 import './Account.css';
 
 type User = { id: number; username: string };
@@ -90,7 +91,7 @@ function Account({ modalOpen }: AccountProps) {
 
             {/* Account Settings: Emily */}
             {activeTab.key === 'settings' && (
-                <p className="text-muted">Account settings coming soon.</p>
+                <AccountSettings />
             )}
         </Container>
     );
