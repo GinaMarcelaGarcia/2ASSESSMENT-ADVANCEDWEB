@@ -51,6 +51,23 @@ function validateReview($data)
     ];
 }
 
+// Reads ?id= from the URL and checks the review belongs to the logged user.
+// Sends 404 when the id does not exist OR belongs to someone else.
+function getOwnReviewId($pdo, $userId)
+{
+    $reviewId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($reviewId === false) {
+        sendError('Invalid review id.', 400);
+    }
+
+    $stmt = $pdo->prepare('SELECT id FROM reviews WHERE id = :id AND user_id = :user');
+    $stmt->execute(['id' => $reviewId, 'user' => $userId]);
+    if ($stmt->fetch() === false) {
+        sendError('Review not found.', 404);
+    }
+    return $reviewId;
+}
+
 // ---------------------------------------------------------------------
 // GET ?album=5 : reviews of one album
 // ---------------------------------------------------------------------
@@ -146,6 +163,47 @@ if ($method === 'POST') {
 
     // 201 = "created". We send back the new id.
     sendJson(['id' => (int) $pdo->lastInsertId()], 201);
+}
+
+// ---------------------------------------------------------------------
+// PUT ?id=3 : edit own review
+// Body (JSON): { rating, title, body, listened_at (optional) }
+// ---------------------------------------------------------------------
+if ($method === 'PUT') {
+    $userId = requireLogin();
+    $reviewId = getOwnReviewId($pdo, $userId);
+    $review = validateReview(getJsonBody());
+
+    // album_id is not changed: a review always stays on the same album.
+    // user_id stays in the WHERE as a second protection.
+    $stmt = $pdo->prepare('
+        UPDATE reviews
+        SET rating = :rating, title = :title, body = :body, listened_at = :listened_at
+        WHERE id = :id AND user_id = :user
+    ');
+    $stmt->execute([
+        'rating' => $review['rating'],
+        'title' => $review['title'],
+        'body' => $review['body'],
+        'listened_at' => $review['listened_at'],
+        'id' => $reviewId,
+        'user' => $userId,
+    ]);
+
+    sendJson(['id' => $reviewId]);
+}
+
+// ---------------------------------------------------------------------
+// DELETE ?id=3 : delete own review
+// ---------------------------------------------------------------------
+if ($method === 'DELETE') {
+    $userId = requireLogin();
+    $reviewId = getOwnReviewId($pdo, $userId);
+
+    $stmt = $pdo->prepare('DELETE FROM reviews WHERE id = :id AND user_id = :user');
+    $stmt->execute(['id' => $reviewId, 'user' => $userId]);
+
+    sendJson(['id' => $reviewId]);
 }
 
 // No case above matched this request
