@@ -8,6 +8,7 @@ import { Link, useSearchParams } from 'react-router';
 import Container from 'react-bootstrap/Container';
 import { apiGet } from '../api';
 import AccountSettings from '../components/AccountSettings';
+import MyReviews from '../components/MyReviews';
 import './Account.css';
 
 type User = { id: number; username: string };
@@ -81,7 +82,7 @@ function Account({ modalOpen }: AccountProps) {
             {/* Content of the open tab */}
             {/* My reviews: Vinny */}
             {activeTab.key === 'reviews' && (
-                <p className="text-muted">Your reviews will appear here.</p>
+                <MyReviews />
             )}
 
             {/* My favourites: Gina */}
