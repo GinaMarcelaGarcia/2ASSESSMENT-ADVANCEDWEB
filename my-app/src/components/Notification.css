@@ -1,0 +1,42 @@
+/* Message at the top of the screen (e.g. "Logged out successfully") */
+.tb-toast {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1.25rem 0.6rem 0.6rem;
+    background-color: #fff;
+    color: #1e1e1e;
+    border-radius: 999px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    /* slides down when it appears, slides up before it disappears */
+    animation:
+        tb-toast-in 0.35s ease-out,
+        tb-toast-out 0.35s ease-in 2.15s forwards;
+}
+
+/* Red circle with the white check */
+.tb-toast-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--tb-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes tb-toast-in {
+    from { opacity: 0; transform: translate(-50%, -16px); }
+    to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes tb-toast-out {
+    to { opacity: 0; transform: translate(-50%, -16px); }
+}

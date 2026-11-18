@@ -11,6 +11,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import { apiGet, apiPost } from '../api';
+import { useNotify } from '../notification';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 
@@ -24,6 +25,7 @@ function SiteNavbar() {
 
   const location = useLocation(); // current page, changes on every navigation
   const navigate = useNavigate(); // lets us change page from code
+  const notify = useNotify();     // message at the top of the screen
   
   // Hamburger menu (small screens): open or closed.
   // It closes by itself when the page changes.
@@ -44,16 +46,19 @@ function SiteNavbar() {
 
   // Ask PHP who is logged in every time the page changes.
   // So after Login sends the user to another page, the navbar updates by itself.
+  // location.key changes on every navigation, even to the same URL
+  // (e.g. after changing the username on the account page).
   useEffect(() => {
     apiGet<User | null>('me.php')
       .then(setUser)
       .catch(() => setUser(null));
-  }, [location.pathname]);
+    }, [location.key]);
 
   async function handleLogout() {
     try {
       await apiPost('logout.php');
       setUser(null);
+      notify('Logged out successfully.');
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -120,6 +125,8 @@ function SiteNavbar() {
           <Nav className="align-items-lg-center gap-2">
             {user ? (
               <NavDropdown title={user.username} id="user-menu" align="end">
+                <NavDropdown.Item as={Link} to="/account">My account</NavDropdown.Item>
+                <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>Log out</NavDropdown.Item>
               </NavDropdown>
             ) : (
