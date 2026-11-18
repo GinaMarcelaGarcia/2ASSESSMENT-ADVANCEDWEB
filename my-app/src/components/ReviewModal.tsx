@@ -1,11 +1,18 @@
 import { useState, type FormEvent } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import type { AlbumReview } from '../types';
 import { apiDelete, apiPost, apiPut, IMAGES_URL } from '../api';
+
+type EditableReview = {
+    id: number;
+    rating: number;
+    title: string;
+    body: string;
+    listened_at: string | null;
+};
 
 type ReviewModalProps = {
     album: { id: number; title: string; artist: string; cover_image: string };
-    existingReview: AlbumReview | null; // null = new review, otherwise edit this one
+    existingReview: EditableReview | null; // null = new review, otherwise edit this one
     onClose: () => void;
     onSaved: () => void; // tells the page to load the reviews again
 };

@@ -1,0 +1,39 @@
+/* My reviews tab (Account page) */
+
+/* White box, same look as the Account Settings cards */
+.my-review-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Album cover: always a square, the image is cut to fit */
+.my-review-cover {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.my-review-album {
+    color: var(--tb-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.my-review-album:hover {
+    text-decoration: underline;
+}
+
+/* Amber stars from the Figma */
+.my-review-stars {
+    color: #E9A63E;
+    letter-spacing: 2px;
+}
+
+/* Keeps the line breaks the user typed in the review */
+.my-review-body {
+    white-space: pre-line;
+}
