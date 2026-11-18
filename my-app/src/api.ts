@@ -43,6 +43,26 @@ export async function apiPost<T>(path: string, body: object = {}): Promise<T> {
   return readAnswer<T>(response);
 }
 
+// PUT request with a JSON body. Example: await apiPut(`reviews.php?id=${id}`, { rating, title, body });
+export async function apiPut<T>(path: string, body: object = {}): Promise<T> {
+  const response = await send(`${API_URL}/${path}`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return readAnswer<T>(response);
+}
+
+// DELETE request. Example: await apiDelete(`reviews.php?id=${id}`);
+export async function apiDelete<T>(path: string): Promise<T> {
+  const response = await send(`${API_URL}/${path}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+  return readAnswer<T>(response);
+}
+
 // Turns the PHP answer into data, or throws an Error with the PHP message.
 // The page catches it and shows the message to the user.
 async function readAnswer<T>(response: Response): Promise<T> {

@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router";
 import "./AlbumDetail.css";
 import { apiGet, IMAGES_URL } from "../api";
 import RandomAlbums from "./RandomAlbums";
-import type { Album } from "../types";
+import type { Album, AlbumReview } from "../types";
+import ReviewModal from "../components/ReviewModal";
 
 type AlbumDetailsData = {
   id: number;
@@ -25,48 +26,14 @@ type AlbumDetailsData = {
 
 /* REVIEWS */
 
-type Review = {
-  id: number;
-  name: string;
-  photo: string;
-  date: string;
-  rating: number;
-  comment: string;
-  favouriteAlbum: string;
-};
-
-const reviewData: Review[] = [
-  {
-    id: 1,
-    name: "Joe Doe",
-    photo: "/1PhotoReview.png",
-    date: "25 Sep 2026",
-    rating: 5,
-    comment:
-      "Update (after seeing the opinions of others): Y'all won't be happy with ANYTHING OMG, if any other artist released these four tracks y'all wouldn't shut up about how good they are. 🫩",
-    favouriteAlbum: "Lunar Dust"
-  },
-  {
-    id: 2,
-    name: "Luisa Elz",
-    photo: "/2PhotoReview.png",
-    date: "26 Sep 2026",
-    rating: 5,
-    comment:
-      "Honestly, I didn’t expect to enjoy this album as much as I did. Some of the songs are definitely more playful than what I usually listen to, but I think that’s what makes it fun.",
-    favouriteAlbum: "Velvet Hours"
-  },
-];
-
-const reviews: Review[] = [
-  ...reviewData,
-  ...reviewData,
-  ...reviewData,
-].map((review, index) => ({
-  ...review,
-  id: index + 1,
-}));
-
+// "2026-11-17 18:39:50" (MySQL format) -> "17 Nov 2026"
+function formatDate(mysqlDate: string) {
+  return new Date(mysqlDate.replace(" ", "T")).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 /* END REVIEWS */
 
 function AlbumDetail() {
@@ -79,16 +46,34 @@ function AlbumDetail() {
   const [randomAlbums, setRandomAlbums] = useState<Album[]>([]);
   const [popularPage, setPopularPage] = useState(1);
 
-  /* REVIEW NAVIGATION */
+    /* REVIEWS */
 
+  const [reviews, setReviews] = useState<AlbumReview[]>([]);
+  const [reviewsError, setReviewsError] = useState("");
   const [reviewIndex, setReviewIndex] = useState(0);
 
-  const visibleReviews = [
-    reviews[reviewIndex],
-    reviews[(reviewIndex + 1) % reviews.length],
-  ];
+    // Goes up by 1 after a review is saved: the album and the reviews load again
+  const [reloadKey, setReloadKey] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [modalReview, setModalReview] = useState<AlbumReview | null>(null);
 
-  /* ALBUM DETAILS */
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    apiGet<{ id: number; username: string } | null>("me.php")
+      .then((user) => setCurrentUserId(user ? user.id : null))
+      .catch(() => setCurrentUserId(null));
+  }, [showReviewModal]); // asks again when a modal closes (e.g. after logging in)
+
+  const hasMyReview = reviews.some((review) => review.user_id === currentUserId); 
+
+  // Shows 2 cards at a time. With 2 or fewer reviews, shows all of them.
+  const visibleReviews =
+    reviews.length <= 2
+      ? reviews
+      : [reviews[reviewIndex], reviews[(reviewIndex + 1) % reviews.length]];
+
+        /* ALBUM DETAILS */
 
   useEffect(() => {
     if (!id) return;
@@ -96,7 +81,20 @@ function AlbumDetail() {
     apiGet<AlbumDetailsData>(`albums.php?id=${id}`)
       .then((data) => setAlbum(data))
       .catch((err: Error) => setError(err.message));
-  }, [id]);
+  }, [id, reloadKey]);
+
+    /* ALBUM REVIEWS */
+
+  useEffect(() => {
+    if (!id) return;
+
+    apiGet<AlbumReview[]>(`reviews.php?album=${id}`)
+      .then((data) => {
+        setReviews(data);
+        setReviewIndex(0); // other album: start again from the first card
+      })
+      .catch((err: Error) => setReviewsError(err.message));
+  }, [id, reloadKey]);
 
   /* POPULAR ALBUMS */
 
@@ -113,6 +111,29 @@ function AlbumDetail() {
       .then((data) => setRandomAlbums(data))
       .catch((err: Error) => setError(err.message));
   }, []);
+
+  /* WRITE A REVIEW */
+
+  async function openReviewModal() {
+    try {
+      // Asks PHP who is logged in right now
+      const user = await apiGet<{ id: number; username: string } | null>("me.php");
+      if (!user) {
+        navigate("/login"); // opens the login modal on top of this page
+        return;
+      }
+      // One review per album: if this user already has one, the modal edits it
+      setModalReview(reviews.find((review) => review.user_id === user.id) ?? null);
+      setShowReviewModal(true);
+    } catch (err) {
+      setReviewsError(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  function handleReviewSaved() {
+    setShowReviewModal(false);
+    setReloadKey((key) => key + 1);
+  }
 
   if (error) return <p>{error}</p>;
   if (!album) return <p>Loading album...</p>;
@@ -200,8 +221,8 @@ function AlbumDetail() {
           <div className="write-review-container">
             <span className="write-review-star">⭐</span>
 
-            <button className="write-review-button" type="button">
-              Write a review
+              <button className="write-review-button" type="button" onClick={openReviewModal}>
+              {hasMyReview ? "Edit your review" : "Write a review"}
             </button>
           </div>
 
@@ -266,84 +287,86 @@ function AlbumDetail() {
         <h2>Album Reviews</h2>
       </div>
 
-      <section className="album-reviews-container">
+            <section className="album-reviews-container">
 
-        {/* LEFT ARROW */}
+        {reviewsError && <p>{reviewsError}</p>}
 
-        <button
-          className="reviews-arrow reviews-arrow-left"
-          type="button"
-          onClick={() =>
-            setReviewIndex((prev) =>
-              (prev - 1 + reviews.length) % reviews.length
-            )
-          }
-          aria-label="Previous reviews"
-        >
-          &#10094;
-        </button>
+        {!reviewsError && reviews.length === 0 && (
+          <p className="album-no-reviews">No reviews yet. Be the first to review this album!</p>
+        )}
+
+        {/* LEFT ARROW: only when there are more than 2 reviews */}
+
+        {reviews.length > 2 && (
+          <button
+            className="reviews-arrow reviews-arrow-left"
+            type="button"
+            onClick={() =>
+              setReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length)
+            }
+            aria-label="Previous reviews"
+          >
+            &#10094;
+          </button>
+        )}
 
         {/* REVIEW CARDS */}
 
-        <div className="reviews-grid">
+        {reviews.length > 0 && (
+          <div className="reviews-grid">
+            {visibleReviews.map((review) => (
+              <article className="review-card" key={review.id}>
 
-          {visibleReviews.map((review) => (
-            <article className="review-card" key={review.id}>
+                <div className="review-user-info">
 
-              <div className="review-user-info">
-
-                <img
-                  className="review-user-photo"
-                  src={review.photo}
-                  alt={review.name}
-                />
-
-                <div className="review-user-details">
-
-                  <h3>Review by {review.name}</h3>
-
-                  <div className="review-stars">
-                    {"★".repeat(review.rating)}
+                  {/* No profile photo yet: shows the first letter of the username */}
+                  <div className="review-user-photo review-user-initial">
+                    {review.username.charAt(0).toUpperCase()}
                   </div>
 
-                  <p className="review-date">
-                    Reviewed on {review.date}
-                  </p>
+                  <div className="review-user-details">
+                    <h3>Review by {review.username}</h3>
+
+                    <div className="review-stars">
+                      {"★".repeat(review.rating)}
+                      {"☆".repeat(5 - review.rating)}
+                    </div>
+
+                    <p className="review-date">
+                      Reviewed on {formatDate(review.created_at)}
+                    </p>
+                  </div>
 
                 </div>
 
-              </div>
+                <div className="review-comment">
+                  <p><strong>{review.title}</strong></p>
+                  <p>{review.body}</p>
 
-              <div className="review-comment">
+                  {review.listened_at && (
+                    <p><strong>Listened on:</strong> {formatDate(review.listened_at)}</p>
+                  )}
+                </div>
 
-                <p>{review.comment}</p>
-
-                <p>
-                  <strong>Favourite Album:</strong>{" "}
-                  {review.favouriteAlbum}
-                </p>
-
-              </div>
-
-            </article>
-          ))}
-
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         {/* RIGHT ARROW */}
 
-        <button
-          className="reviews-arrow reviews-arrow-right"
-          type="button"
-          onClick={() =>
-            setReviewIndex((prev) =>
-              (prev + 1) % reviews.length
-            )
-          }
-          aria-label="Next reviews"
-        >
-          &#10095;
-        </button>
+        {reviews.length > 2 && (
+          <button
+            className="reviews-arrow reviews-arrow-right"
+            type="button"
+            onClick={() =>
+              setReviewIndex((prev) => (prev + 1) % reviews.length)
+            }
+            aria-label="Next reviews"
+          >
+            &#10095;
+          </button>
+        )}
 
       </section>
 
@@ -354,8 +377,19 @@ function AlbumDetail() {
         title="You might also like"
       />
 
+            {/* Rendered only while open, so the form always starts fresh */}
+      {showReviewModal && (
+        <ReviewModal
+          album={album}
+          existingReview={modalReview}
+          onClose={() => setShowReviewModal(false)}
+          onSaved={handleReviewSaved}
+        />
+      )}
+
     </div>
   );
 }
 
 export default AlbumDetail;
+

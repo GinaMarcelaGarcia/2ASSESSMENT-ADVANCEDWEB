@@ -14,3 +14,30 @@ export type Genre = {
   id: number;
   name: string;
 };
+
+// One review on the Album Detail page (GET reviews.php?album=5)
+export type AlbumReview = {
+  id: number;
+  rating: number;
+  title: string;
+  body: string;
+  listened_at: string | null;
+  created_at: string;
+  user_id: number;
+  username: string;
+  avatar: string | null;
+};
+
+// One review on the My reviews tab (GET reviews.php?mine=1)
+export type MyReview = {
+  id: number;
+  rating: number;
+  title: string;
+  body: string;
+  listened_at: string | null;
+  created_at: string;
+  album_id: number;
+  album_title: string;
+  cover_image: string;
+  artist: string;
+};
