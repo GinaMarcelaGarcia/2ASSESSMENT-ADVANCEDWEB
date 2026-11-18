@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import { apiPost, apiPut, IMAGES_URL } from '../api';
 import type { AlbumReview } from '../types';
+import { apiDelete, apiPost, apiPut, IMAGES_URL } from '../api';
 
 type ReviewModalProps = {
     album: { id: number; title: string; artist: string; cover_image: string };
@@ -26,6 +26,7 @@ function ReviewModal({ album, existingReview, onClose, onSaved }: ReviewModalPro
     const [errors, setErrors] = useState<ReviewErrors>({});
     const [serverError, setServerError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     // Today in the user's own time zone, as YYYY-MM-DD (the date input needs this format)
     const today = new Date().toLocaleDateString('en-CA');
@@ -73,6 +74,23 @@ function ReviewModal({ album, existingReview, onClose, onSaved }: ReviewModalPro
         } catch (error) {
             // e.g. "You already reviewed this album..." from PHP
             setServerError(error instanceof Error ? error.message : 'Something went wrong.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+        async function handleDelete() {
+        if (!existingReview) return; // only an existing review can be deleted
+
+        setServerError('');
+        setLoading(true);
+        try {
+            // PHP only deletes it if this review belongs to the logged-in user
+            await apiDelete(`reviews.php?id=${existingReview.id}`);
+            onSaved(); // same as after saving: close the modal and load the reviews again
+        } catch (error) {
+            setServerError(error instanceof Error ? error.message : 'Something went wrong.');
+            setConfirmDelete(false);
         } finally {
             setLoading(false);
         }
@@ -169,15 +187,52 @@ function ReviewModal({ album, existingReview, onClose, onSaved }: ReviewModalPro
                         {errors.body && <div className="invalid-feedback">{errors.body}</div>}
                     </div>
 
-                    <div className="text-center">
-                        <button
-                            type="submit"
-                            className="btn text-white rounded-pill px-5"
-                            style={{ backgroundColor: 'var(--tb-primary)' }}
-                            disabled={loading}
-                        >
-                            {loading ? 'Saving...' : 'Save review'}
-                        </button>
+                    <div className="d-flex flex-wrap justify-content-center gap-2">
+                        {confirmDelete ? (
+                            // Second step: the user must confirm the delete
+                            <>
+                                <span className="w-100 text-center small">Delete this review? This can't be undone.</span>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger rounded-pill px-4"
+                                    onClick={handleDelete}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Deleting...' : 'Yes, delete'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary rounded-pill px-4"
+                                    onClick={() => setConfirmDelete(false)}
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    type="submit"
+                                    className="btn text-white rounded-pill px-5"
+                                    style={{ backgroundColor: 'var(--tb-primary)' }}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : 'Save review'}
+                                </button>
+
+                                {/* Delete only shows when editing a review that already exists */}
+                                {existingReview && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-danger rounded-pill px-4"
+                                        onClick={() => setConfirmDelete(true)}
+                                        disabled={loading}
+                                    >
+                                        Delete
+                                    </button>
+                                )}
+                            </>
+                        )}
                     </div>
                 </form>
             </Modal.Body>

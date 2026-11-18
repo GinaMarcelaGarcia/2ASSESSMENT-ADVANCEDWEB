@@ -57,6 +57,16 @@ function AlbumDetail() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [modalReview, setModalReview] = useState<AlbumReview | null>(null);
 
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  useEffect(() => {
+    apiGet<{ id: number; username: string } | null>("me.php")
+      .then((user) => setCurrentUserId(user ? user.id : null))
+      .catch(() => setCurrentUserId(null));
+  }, [showReviewModal]); // asks again when a modal closes (e.g. after logging in)
+
+  const hasMyReview = reviews.some((review) => review.user_id === currentUserId); 
+
   // Shows 2 cards at a time. With 2 or fewer reviews, shows all of them.
   const visibleReviews =
     reviews.length <= 2
@@ -211,8 +221,8 @@ function AlbumDetail() {
           <div className="write-review-container">
             <span className="write-review-star">⭐</span>
 
-            <button className="write-review-button" type="button" onClick={openReviewModal}>
-              Write a review
+              <button className="write-review-button" type="button" onClick={openReviewModal}>
+              {hasMyReview ? "Edit your review" : "Write a review"}
             </button>
           </div>
 
