@@ -5,6 +5,7 @@ import "./HomeTrack.css";
 import RandomAlbums from "./RandomAlbums";
 import { apiGet, IMAGES_URL } from "../api";
 import type { Album, Genre } from "../types";
+import FavouriteButton from "../components/FavouriteButton";
 
 function Home() {
   const navigate = useNavigate();
@@ -170,14 +171,21 @@ useEffect(() => {
                     <h3>{album.title}</h3>
                   </div>
 
-                  <p>{album.artist}</p>
-                  <span>{album.year}</span>
+                  <div className="gallery-info-row">
+  <div className="gallery-info">
+    <p>{album.artist}</p>
+    <span>{album.year}</span>
 
-                  <div className="gallery-rating">
-                    {album.avg_rating !== null
-                      ? `★ ${album.avg_rating} (${album.review_count})`
-                      : "No reviews yet"}
-                  </div>
+    <div className="gallery-rating">
+      {album.avg_rating !== null
+        ? `★ ${album.avg_rating} (${album.review_count})`
+        : "No reviews yet"}
+    </div>
+  </div>
+
+  <FavouriteButton albumId={album.id} variant="icon" />
+</div>
+
                 </div>
               ))}
             </div>
@@ -291,13 +299,20 @@ useEffect(() => {
                   />
                   <h3>{album.title}</h3>
                 </div>
-                <p>{album.artist}</p>
-                <span>{album.year}</span>
-                <div className="gallery-rating">
-                  {album.avg_rating !== null
-                    ? `★ ${album.avg_rating} (${album.review_count})`
-                    : "No reviews yet"}
-                </div>
+               <div className="gallery-info-row">
+  <div className="gallery-info">
+    <p>{album.artist}</p>
+    <span>{album.year}</span>
+
+    <div className="gallery-rating">
+      {album.avg_rating !== null
+        ? `★ ${album.avg_rating} (${album.review_count})`
+        : "No reviews yet"}
+    </div>
+  </div>
+
+  <FavouriteButton albumId={album.id} variant="icon" />
+</div>
               </div>
             ))}
           </div>

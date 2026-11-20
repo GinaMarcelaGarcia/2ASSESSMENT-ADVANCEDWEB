@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";  // Import navigation hook
 import type { Album } from "../types";  // Import Album type
 import "./RandomAlbums.css"; // Import component styles
 import { IMAGES_URL } from "../api"; // Import album images URL
+import FavouriteButton from "../components/FavouriteButton";
 
 // Random Albums component
 function RandomAlbums({
@@ -64,21 +65,22 @@ function RandomAlbums({
           {/* Display the visible album cards */}
           <div className="albums-grid">
             {visibleAlbums.map((album) => (
-              <div
-               className="album-card"
-               key={album.id}
-               onClick={() => navigate(`/album/${album.id}`)}
-                style={{ cursor: "pointer" }}
-          >
-                {/* Album cover image */}
-                <img
-                  src={`${IMAGES_URL}/${album.cover_image}`}
-                  alt={album.title}
-                />
-                <h3>{album.title}</h3>
-                <p>{album.artist}</p>
-              </div>
-            ))}
+  <div
+    className="album-card"
+    key={album.id}
+    onClick={() => navigate(`/album/${album.id}`)}
+    style={{ cursor: "pointer" }}
+  >
+    <div className="album-cover-area">
+      <img src={`${IMAGES_URL}/${album.cover_image}`} alt={album.title} />
+      <h3>{album.title}</h3>
+    </div>
+
+   <p>{album.artist}</p>
+
+    <FavouriteButton albumId={album.id} />
+  </div>
+))}
           </div>
 
           {/* Next albums button */}

@@ -391,3 +391,36 @@
 .close-search-results:hover {
   color: #C1330F;
 }
+
+/* Album information and favourite star */
+.gallery-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gallery-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gallery-info p {
+  margin: 0 0 4px;
+}
+
+.gallery-info span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Favourite star in Home */
+.favourite-button-container.icon-only {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.favourite-button-icon .favourite-star {
+  display: inline-block;
+  line-height: 1;
+}

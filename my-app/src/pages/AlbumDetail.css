@@ -666,3 +666,38 @@
   font-size: 30px;
   font-weight: 700;
 }
+
+/* Favourite button */
+.favourite-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff;
+    border: 1.5px solid #E9A63E;
+    border-radius: 10px;
+    padding: 9px 16px;
+    color: #222;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.favourite-button .favourite-star {
+    color: #F5B800;
+    font-size: 25px;
+    line-height: 1;
+}
+
+.favourite-button:hover {
+    background-color: #fffaf0;
+}
+
+.favourite-button.active {
+    background-color: #fff8e8;
+}
+
+.favourite-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

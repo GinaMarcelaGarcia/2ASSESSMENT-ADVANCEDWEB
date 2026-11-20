@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import "./AlbumDetail.css";
-import { apiGet, IMAGES_URL } from "../api";
+import { apiGet, apiPost, apiDelete, IMAGES_URL } from "../api";
 import RandomAlbums from "./RandomAlbums";
 import type { Album, AlbumReview } from "../types";
 import ReviewModal from "../components/ReviewModal";
@@ -58,6 +58,22 @@ function AlbumDetail() {
   const [modalReview, setModalReview] = useState<AlbumReview | null>(null);
 
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  // FAVOURITES
+const [isFavourite, setIsFavourite] = useState(false);
+const [favouriteLoading, setFavouriteLoading] = useState(false);
+const [favouriteError, setFavouriteError] = useState("");
+
+// CHECK FAVOURITE STATUS
+useEffect(() => {
+  if (!id || !currentUserId) {
+    setIsFavourite(false);
+    return;
+  }
+
+  apiGet<{ is_favourite: boolean }>(`favourites.php?album=${id}`)
+    .then((data) => setIsFavourite(data.is_favourite))
+    .catch((err: Error) => setFavouriteError(err.message));
+}, [id, currentUserId]);
 
   useEffect(() => {
     apiGet<{ id: number; username: string } | null>("me.php")
@@ -66,6 +82,37 @@ function AlbumDetail() {
   }, [showReviewModal]); // asks again when a modal closes (e.g. after logging in)
 
   const hasMyReview = reviews.some((review) => review.user_id === currentUserId); 
+
+  // TOGGLE FAVOURITE
+async function handleFavourite() {
+  if (!currentUserId) {
+    navigate("/login");
+    return;
+  }
+
+  if (!id || favouriteLoading) return;
+
+  setFavouriteLoading(true);
+  setFavouriteError("");
+
+  try {
+    if (isFavourite) {
+      await apiDelete(`favourites.php?album=${id}`);
+      setIsFavourite(false);
+    } else {
+      await apiPost("favourites.php", {
+        album_id: Number(id),
+      });
+      setIsFavourite(true);
+    }
+  } catch (err) {
+    setFavouriteError(
+      err instanceof Error ? err.message : "Something went wrong."
+    );
+  } finally {
+    setFavouriteLoading(false);
+  }
+}
 
   // Shows 2 cards at a time. With 2 or fewer reviews, shows all of them.
   const visibleReviews =
@@ -186,6 +233,26 @@ function AlbumDetail() {
 
                         <div className="album-title-rating">
               <h2>{album.title}</h2>
+
+              <button
+  type="button"
+  className={`favourite-button ${isFavourite ? "active" : ""}`}
+  onClick={handleFavourite}
+  disabled={favouriteLoading}
+>
+  <span className="favourite-star">★</span>
+  <span>
+    {favouriteLoading
+      ? "Saving..."
+      : isFavourite
+        ? "Added to favourites"
+        : "Add to favourite"}
+  </span>
+</button>
+
+{favouriteError && (
+  <p className="favourite-error">{favouriteError}</p>
+)}
 
               {album.avg_rating !== null ? (
                 <div className="album-stars">

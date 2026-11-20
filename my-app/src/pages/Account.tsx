@@ -10,6 +10,7 @@ import { apiGet } from '../api';
 import AccountSettings from '../components/AccountSettings';
 import MyReviews from '../components/MyReviews';
 import './Account.css';
+import MyFavourites from '../components/MyFavourites';
 
 type User = { id: number; username: string };
 
@@ -87,8 +88,8 @@ function Account({ modalOpen }: AccountProps) {
 
             {/* My favourites: Gina */}
             {activeTab.key === 'favourites' && (
-                <p className="text-muted">Your favourite albums will appear here.</p>
-            )}
+            <MyFavourites />
+        )}
 
             {/* Account Settings: Emily */}
             {activeTab.key === 'settings' && (
