@@ -41,3 +41,17 @@ export type MyReview = {
   cover_image: string;
   artist: string;
 };
+
+// One review in Browse by rating on the Home page (GET reviews.php?level=must-hear)
+export type RatingReview = {
+  id: number;
+  rating: number;
+  title: string;
+  body: string;
+  created_at: string;
+  username: string;
+  album_id: number;
+  album_title: string;
+  cover_image: string;
+  artist: string;
+};

@@ -6,6 +6,8 @@ import RandomAlbums from "./RandomAlbums";
 import { apiGet, IMAGES_URL } from "../api";
 import type { Album, Genre } from "../types";
 import FavouriteButton from "../components/FavouriteButton";
+import HighestRated from "../components/HighestRated";
+import BrowseByRating from "../components/BrowseByRating";
 
 function Home() {
   const navigate = useNavigate();
@@ -202,6 +204,9 @@ useEffect(() => {
         <RandomAlbums albums={exploreAlbums} />
       )}
 
+      {/* HIGHEST RATED: best average rating (component by Vinny) */}
+      <HighestRated />
+
       <section className="filter-albums">
         <h2 className="filter-title">
           <i className="bi bi-sliders2"></i>
@@ -256,27 +261,8 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* BROWSE BY RATING */}
-      <section className="browse-rating">
-        <h2>Browse by rating</h2>
-
-        <div className="rating-options">
-          <button type="button" className="rating-option">
-            <span className="rating-emoji">🔥</span>
-            <span>Must Hear</span>
-          </button>
-
-          <button type="button" className="rating-option">
-            <span className="rating-emoji">💗</span>
-            <span>Loved</span>
-          </button>
-
-          <button type="button" className="rating-option">
-            <span className="rating-emoji">😐</span>
-            <span>Okay</span>
-          </button>
-        </div>
-      </section>
+      {/* BROWSE BY RATING: emoji filters for reviews (component by Vinny) */}
+      <BrowseByRating />
 
             {/* GALLERY */}
       <section className="album-gallery">

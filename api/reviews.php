@@ -2,6 +2,7 @@
 // reviews.php
 // GET    /api/reviews.php?album=5  -> reviews of one album (anyone can read)
 // GET    /api/reviews.php?mine=1   -> reviews of the logged user (My reviews tab)
+// GET    /api/reviews.php?level=must-hear -> Browse by rating (Home page, anyone can read)
 // POST   /api/reviews.php          -> create a review (login needed)
 // PUT    /api/reviews.php?id=3     -> edit own review (login needed)
 // DELETE /api/reviews.php?id=3     -> delete own review (login needed)
@@ -89,6 +90,48 @@ if ($method === 'GET' && isset($_GET['album'])) {
         ORDER BY r.created_at DESC
     ');
     $stmt->execute(['album' => $albumId]);
+
+    sendJson($stmt->fetchAll());
+}
+
+// ---------------------------------------------------------------------
+// GET ?level=must-hear : Browse by rating (Home page)
+// ---------------------------------------------------------------------
+// Each emoji on the Home page is a filter for REVIEWS by their star rating,
+// as we planned in the proposal:
+//   Must Hear = 4-5 stars, Loved = 3 stars, Okay = 1-2 stars
+if ($method === 'GET' && isset($_GET['level'])) {
+    $levels = [
+        'must-hear' => [4, 5],
+        'loved'     => [3, 3],
+        'okay'      => [1, 2],
+    ];
+
+    // Only the 3 names above are accepted. The numbers come from our array,
+    // never from the URL, so the user cannot send their own range.
+    $level = $_GET['level'];
+    if (!is_string($level) || !isset($levels[$level])) {
+        sendError('Invalid rating level.', 400);
+    }
+    [$min, $max] = $levels[$level];
+
+    // JOIN albums + artists for the card (cover, title, artist)
+    // and users for who wrote it (only the username, never email or password).
+    // Newest first, max 12 so the Home page does not get too long.
+    $stmt = $pdo->prepare('
+        SELECT r.id, r.rating, r.title, r.body, r.created_at,
+               u.username,
+               a.id AS album_id, a.title AS album_title, a.cover_image,
+               ar.name AS artist
+        FROM reviews r
+        JOIN users u    ON u.id = r.user_id
+        JOIN albums a   ON a.id = r.album_id
+        JOIN artists ar ON ar.id = a.artist_id
+        WHERE r.rating BETWEEN :min AND :max
+        ORDER BY r.created_at DESC
+        LIMIT 12
+    ');
+    $stmt->execute(['min' => $min, 'max' => $max]);
 
     sendJson($stmt->fetchAll());
 }

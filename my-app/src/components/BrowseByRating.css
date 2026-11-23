@@ -1,0 +1,71 @@
+/* Browse by rating results (Home page). The emoji buttons use HomeTrack.css */
+
+.rating-results {
+    max-width: 1100px;
+    margin: 25px auto 0;
+}
+
+.rating-results-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #974E25; /* brown from the Figma */
+    margin-bottom: 15px;
+}
+
+/* The whole card is a link to the album page */
+.rating-review-card {
+    display: flex;
+    gap: 12px;
+    height: 100%;
+    padding: 12px;
+    background-color: #FBF4EA;
+    border-radius: 12px;
+    color: #222;
+    text-decoration: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.rating-review-card:hover {
+    color: #222;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Square cover, the image is cut to fit */
+.rating-review-cover {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.rating-review-info {
+    min-width: 0; /* lets long text wrap inside the flex card */
+}
+
+.rating-review-album {
+    font-weight: 700;
+    color: #C1330F; /* red from the Figma */
+}
+
+/* Amber stars, same colour as the album cards */
+.rating-review-stars {
+    color: #E9A63E;
+    letter-spacing: 1px;
+}
+
+.rating-review-title {
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Long reviews: show only the first 3 lines */
+.rating-review-body {
+    font-size: 14px;
+    margin: 2px 0 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

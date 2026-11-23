@@ -3,6 +3,9 @@
 // GET /api/albums.php            -> 8 random albums (Home page cards)
 // GET /api/albums.php?genre=3    -> 8 random albums from one genre (genre filter)
 // GET /api/albums.php?id=1       -> one album with all details (Album Detail page)
+// GET /api/albums.php?popular=1&page=1 -> albums with most reviews in the last 7 days
+// GET /api/albums.php?top=1      -> Highest rated: 8 albums with the best average rating
+// GET /api/albums.php?search=sun -> albums where title, artist or genre has the text
 
 require_once __DIR__ . '/config.php';
 
@@ -96,6 +99,39 @@ if (isset($_GET['popular'])) {
     ');
 
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $albums = $stmt->fetchAll();
+    $albums = array_map('fixRating', $albums);
+
+    sendJson($albums);
+}
+
+
+// ---------------------------------------------------------------------
+// Highest rated: ?top=1
+// ---------------------------------------------------------------------
+if (isset($_GET['top'])) {
+    // JOIN (not LEFT JOIN) reviews: only albums with at least one review.
+    // An album with no reviews has no average, so it cannot be "highest rated".
+    // While the site has no reviews, this returns an empty list [].
+    // Tie on the average: the album with more reviews comes first.
+    $stmt = $pdo->prepare('
+        SELECT a.id, a.title,
+               ar.name AS artist,
+               g.name AS genre,
+               YEAR(a.release_date) AS year,
+               a.cover_image,
+               ROUND(AVG(r.rating), 1) AS avg_rating,
+               COUNT(r.id) AS review_count
+        FROM albums a
+        JOIN artists ar ON ar.id = a.artist_id
+        JOIN genres g   ON g.id = a.genre_id
+        JOIN reviews r  ON r.album_id = a.id
+        GROUP BY a.id
+        ORDER BY avg_rating DESC, review_count DESC, a.id ASC
+        LIMIT 8
+    ');
     $stmt->execute();
 
     $albums = $stmt->fetchAll();
