@@ -1,0 +1,7 @@
+# React Router: every address that is not a real file or folder
+# goes to index.html, so F5 on /album/5 does not give 404.
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
