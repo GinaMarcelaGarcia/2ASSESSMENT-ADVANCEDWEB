@@ -3,11 +3,18 @@
 // Everyone uses apiGet / apiPost instead of calling fetch directly,
 // so nobody forgets credentials: 'include' (needed for the login session).
 
+// npm run dev -> XAMPP on localhost. npm run build -> live server (same domain as the site)
+const IS_DEV = import.meta.env.DEV;
+
 // Folder name inside htdocs (Windows: C:\xampp\htdocs, Mac: /Applications/XAMPP/htdocs)
-export const API_URL = 'http://localhost/2ASSESSMENT-ADVANCEDWEB/api';
+export const API_URL = IS_DEV
+  ? 'http://localhost/2ASSESSMENT-ADVANCEDWEB/api'
+  : '/api';
 
 // Folder with the album cover images (cover_image from albums.php is only the file name)
-export const IMAGES_URL = 'http://localhost/2ASSESSMENT-ADVANCEDWEB/assets/images/albums';
+export const IMAGES_URL = IS_DEV
+  ? 'http://localhost/2ASSESSMENT-ADVANCEDWEB/assets/images/albums'
+  : '/assets/images/albums';
 
 // Same shape that sendJson() and sendError() return in PHP
 type ApiResponse<T> =

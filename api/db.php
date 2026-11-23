@@ -1,20 +1,27 @@
 <?php
 // db.php
 // Opens the connection to the MySQL database with PDO.
+// The details (host, user, password) come from db.local.php,
+// so XAMPP and the live server can use different values.
 
 function getDB()
 {
-    // XAMPP default settings (same on Windows and Mac)
-    $host = 'localhost';
-    $dbname = 'trackback';
-    $user = 'root';
-    $password = '';
+    $configFile = __DIR__ . '/db.local.php';
+
+    // Missing file: clear message in the log, generic message for the user
+    if (!file_exists($configFile)) {
+        error_log('db.local.php is missing. Copy db.example.php to db.local.php.');
+        sendError('Could not connect to the database.', 500);
+    }
+
+    // require (not require_once): it returns the array every time getDB() is called
+    $db = require $configFile;
 
     try {
         $pdo = new PDO(
-            "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-            $user,
-            $password,
+            "mysql:host={$db['host']};dbname={$db['dbname']};charset=utf8mb4",
+            $db['user'],
+            $db['password'],
             [
                 // Any SQL error becomes an exception we can catch
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
